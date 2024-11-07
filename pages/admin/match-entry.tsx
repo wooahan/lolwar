@@ -3,8 +3,20 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { db } from '@/firebaseClient';
-import { collection, getDocs } from 'firebase/firestore';
+import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
+}
+
+const db = getFirestore();
 
 const MatchEntry = () => {
   const router = useRouter();
@@ -20,7 +32,7 @@ const MatchEntry = () => {
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, '선수 정보'));
+        const querySnapshot = await db.collection('선수 정보').get();
         const playerList = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setPlayers(playerList);
       } catch (error) {
