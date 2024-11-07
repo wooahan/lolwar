@@ -125,7 +125,7 @@ const HomePage = () => {
         <ul>
           <li>
             <Link href="/admin/player-management">
-              선수 관리
+              <a>선수 관리</a>
             </Link>
           </li>
         </ul>
