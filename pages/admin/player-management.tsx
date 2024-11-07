@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-
+import Link from 'next/link';
 
 const PlayerManagement = () => {
   const router = useRouter();
@@ -112,7 +112,7 @@ const HomePage = () => {
         <ul>
           <li>
             <Link href="/admin/player-management">
-              <a>Player Management</a>
+              <a>선수 관리</a>
             </Link>
           </li>
         </ul>
