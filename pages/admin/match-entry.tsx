@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { db } from '@/firebaseClient';
+import { collection, getDocs } from 'firebase/firestore';
 
 const MatchEntry = () => {
   const router = useRouter();
@@ -14,10 +16,18 @@ const MatchEntry = () => {
   const [teamAPlayers, setTeamAPlayers] = useState([]);
   const [teamBPlayers, setTeamBPlayers] = useState([]);
 
-  // Load players from local storage on component mount
+  // Load players from Firestore on component mount
   useEffect(() => {
-    const storedPlayers = JSON.parse(localStorage.getItem('players') || '[]');
-    setPlayers(storedPlayers);
+    const fetchPlayers = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, '선수 정보'));
+        const playerList = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setPlayers(playerList);
+      } catch (error) {
+        console.error('Error fetching players: ', error);
+      }
+    };
+    fetchPlayers();
   }, []);
 
   // Mock authentication for simplicity
@@ -138,7 +148,7 @@ const MatchEntry = () => {
                     style={{
                       border: '1px solid blue',
                       padding: '10px',
-                      height: '200px',
+                      height: '400px',
                       width: '100%',
                     }}
                   >
@@ -146,6 +156,30 @@ const MatchEntry = () => {
                     {teamAPlayers.map((player, index) => (
                       <div key={index} style={{ padding: '5px', backgroundColor: '#d0e8ff' }}>
                         {player.name}
+                        <div>
+                          <input
+                            {...register(`teamA.${player.name}.kill`)}
+                            placeholder="킬"
+                            type="number"
+                            min="0"
+                          />
+                          <input
+                            {...register(`teamA.${player.name}.death`)}
+                            placeholder="데스"
+                            type="number"
+                            min="0"
+                          />
+                          <input
+                            {...register(`teamA.${player.name}.assist`)}
+                            placeholder="어시스트"
+                            type="number"
+                            min="0"
+                          />
+                          <input
+                            {...register(`teamA.${player.name}.champion`)}
+                            placeholder="사용한 챔피언"
+                          />
+                        </div>
                       </div>
                     ))}
                     {provided.placeholder}
@@ -160,7 +194,7 @@ const MatchEntry = () => {
                     style={{
                       border: '1px solid red',
                       padding: '10px',
-                      height: '200px',
+                      height: '400px',
                       width: '100%',
                     }}
                   >
@@ -168,6 +202,30 @@ const MatchEntry = () => {
                     {teamBPlayers.map((player, index) => (
                       <div key={index} style={{ padding: '5px', backgroundColor: '#ffd0d0' }}>
                         {player.name}
+                        <div>
+                          <input
+                            {...register(`teamB.${player.name}.kill`)}
+                            placeholder="킬"
+                            type="number"
+                            min="0"
+                          />
+                          <input
+                            {...register(`teamB.${player.name}.death`)}
+                            placeholder="데스"
+                            type="number"
+                            min="0"
+                          />
+                          <input
+                            {...register(`teamB.${player.name}.assist`)}
+                            placeholder="어시스트"
+                            type="number"
+                            min="0"
+                          />
+                          <input
+                            {...register(`teamB.${player.name}.champion`)}
+                            placeholder="사용한 챔피언"
+                          />
+                        </div>
                       </div>
                     ))}
                     {provided.placeholder}
