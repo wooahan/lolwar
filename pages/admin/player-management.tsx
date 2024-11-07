@@ -34,6 +34,7 @@ const PlayerManagement = () => {
           id: doc.id,
           ...doc.data(),
         }));
+        console.log('Fetched Players:', playerList); // 데이터가 올바르게 가져와지는지 확인
         setPlayers(playerList);
       } catch (error) {
         console.error('Error fetching players: ', error);
