@@ -1,6 +1,7 @@
 // File: pages/index.tsx
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 
 const Home = () => {
   const [recentMatches, setRecentMatches] = useState<Array<{ player1: string; player2: string; winner: string }>>([]);
@@ -54,7 +55,9 @@ const Home = () => {
         </section>
 
         <nav className="flex flex-col sm:flex-row justify-around mt-8">
-          <a href="/players" className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">선수 관리</a>
+          <Link href="/admin/player-management">
+            <a className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">선수 관리</a>
+          </Link>
           <a href="/matches" className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">경기 입력</a>
           <a href="/stats" className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">통계 조회</a>
           <a href="/board" className="px-4 py-2 bg-blue-500 text-white rounded">일일 게시판</a>
