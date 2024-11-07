@@ -41,7 +41,9 @@ const PlayerManagement = () => {
     };
 
     fetchPlayers();
+  }, []);
 
+  useEffect(() => {
     const unsubscribe = onSnapshot(playersCollection, (snapshot) => {
       const playerList = snapshot.docs.map((doc) => ({
         id: doc.id,
