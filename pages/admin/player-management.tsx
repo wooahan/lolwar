@@ -1,5 +1,6 @@
 // File: pages/admin/player-management.tsx
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
@@ -68,7 +69,9 @@ const PlayerManagement = () => {
   return (
     <div>
       <h1>선수 관리</h1>
-      <a href="/">홈으로 돌아가기</a>
+      <Link href="/">
+        <a>홈으로 돌아가기</a>
+      </Link>
       <form onSubmit={handleSubmit(onSubmit)}>
         <input {...register('id')} type="hidden" />
         <div>
@@ -81,11 +84,27 @@ const PlayerManagement = () => {
         </div>
         <div>
           <label>메인 포지션</label>
-          <input {...register('mainPosition', { required: true })} placeholder="메인 포지션" />
+          <select {...register('mainPosition', { required: true })}>
+            <option value="">포지션 선택</option>
+            <option value="탑">탑</option>
+            <option value="정글">정글</option>
+            <option value="미드">미드</option>
+            <option value="원딜">원딜</option>
+            <option value="서폿">서폿</option>
+            <option value="올라운더">올라운더</option>
+          </select>
         </div>
         <div>
           <label>서브 포지션</label>
-          <input {...register('secondaryPosition')} placeholder="서브 포지션" />
+          <select {...register('secondaryPosition')}>
+            <option value="">포지션 선택</option>
+            <option value="탑">탑</option>
+            <option value="정글">정글</option>
+            <option value="미드">미드</option>
+            <option value="원딜">원딜</option>
+            <option value="서폿">서폿</option>
+            <option value="올라운더">올라운더</option>
+          </select>
         </div>
         <button type="submit">선수 추가/수정</button>
       </form>
@@ -113,3 +132,26 @@ const PlayerManagement = () => {
 };
 
 export default PlayerManagement;
+
+// File: pages/index.tsx (Main Page)
+
+import Link from 'next/link';
+
+const HomePage = () => {
+  return (
+    <div>
+      <h1>롤 내전 전적 관리 서비스</h1>
+      <nav>
+        <ul>
+          <li>
+            <Link href="/admin/player-management">
+              <a>선수 관리</a>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
+};
+
+export default HomePage;
