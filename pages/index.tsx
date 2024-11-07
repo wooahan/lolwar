@@ -1,7 +1,6 @@
 // File: pages/index.tsx
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
 
 const Home = () => {
   const [recentMatches, setRecentMatches] = useState<{ player1: string; player2: string; winner: string }[]>([]);
@@ -17,7 +16,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className={`${styles.container} flex flex-col items-center justify-center min-h-screen bg-gray-100`}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Head>
         <title>롤 내전 전적 관리 서비스</title>
       </Head>
