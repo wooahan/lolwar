@@ -158,19 +158,36 @@ const MatchEntry = () => {
                           {...provided.droppableProps}
                           ref={provided.innerRef}
                           style={{
-                            border: '1px solid #ccc',
+                            border: '2px dashed #ccc',
                             padding: '10px',
                             minHeight: '100px',
                             marginBottom: '10px',
                             backgroundColor: snapshot.isDraggingOver ? '#e0e0e0' : '#f9f9f9',
                             transition: 'background-color 0.3s ease',
+                            position: 'relative',
                           }}
                         >
                           <strong>{position.toUpperCase()}</strong>
+                          {!teamAPlayers[position] && !teamBPlayers[position] && (
+                            <span
+                              style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                color: '#aaa',
+                                fontSize: '14px',
+                              }}
+                            >
+                              선수 입력
+                            </span>
+                          )}
                           {teamIndex === 0
                             ? teamAPlayers[position] && (
                                 <div style={{ padding: '5px', backgroundColor: '#d0e8ff', marginTop: '5px' }}>
-                                  {teamAPlayers[position].name} ({teamAPlayers[position].nickname})
+                                  {teamAPlayers[position].name}
+                                  <br />
+                                  ({teamAPlayers[position].nickname})
                                   <div>
                                     <input
                                       {...register(`teamA.${position}.player`, { value: teamAPlayers[position].name })}
@@ -203,7 +220,9 @@ const MatchEntry = () => {
                               )
                             : teamBPlayers[position] && (
                                 <div style={{ padding: '5px', backgroundColor: '#ffd0d0', marginTop: '5px' }}>
-                                  {teamBPlayers[position].name} ({teamBPlayers[position].nickname})
+                                  {teamBPlayers[position].name}
+                                  <br />
+                                  ({teamBPlayers[position].nickname})
                                   <div>
                                     <input
                                       {...register(`teamB.${position}.player`, { value: teamBPlayers[position].name })}
