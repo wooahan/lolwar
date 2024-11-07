@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { db } from '../../firebaseClient'; // firebaseClient 경로에 맞게 설정
+import { db } from '../../firebaseClient';
 import {
   collection,
   addDoc,
@@ -12,6 +12,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  onSnapshot,
 } from 'firebase/firestore';
 
 const PlayerManagement = () => {
@@ -24,21 +25,17 @@ const PlayerManagement = () => {
   // Firestore 컬렉션 참조 생성
   const playersCollection = collection(db, '선수 정보');
 
-  // Load players from Firestore on component mount
+  // 실시간 데이터 동기화를 위해 onSnapshot 사용
   useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const playerSnapshot = await getDocs(playersCollection);
-        const playerList = playerSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPlayers(playerList);
-      } catch (error) {
-        console.error('Error fetching players: ', error);
-      }
-    };
-    fetchPlayers();
+    const unsubscribe = onSnapshot(playersCollection, (snapshot) => {
+      const playerList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPlayers(playerList);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Mock authentication for simplicity
