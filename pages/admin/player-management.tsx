@@ -14,7 +14,7 @@ const PlayerManagement = () => {
 
   // Mock authentication for simplicity
   const authenticate = () => {
-    if (password === 'adminpassword') { // Change 'adminpassword' to a secure password
+    if (password === '1717') { // Change 'adminpassword' to a secure password
       setIsAuthenticated(true);
     } else {
       alert('Invalid password!');
@@ -100,3 +100,25 @@ const PlayerManagement = () => {
 };
 
 export default PlayerManagement;
+
+// File: pages/index.tsx (Main Page)
+import Link from 'next/link';
+
+const HomePage = () => {
+  return (
+    <div>
+      <h1>Welcome to In-House League Management</h1>
+      <nav>
+        <ul>
+          <li>
+            <Link href="/admin/player-management">
+              <a>Player Management</a>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
+};
+
+export default HomePage;
