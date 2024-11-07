@@ -17,15 +17,17 @@ const MatchEntry = () => {
 
   // Load players from API on component mount
   useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await axios.get('/api/get-players');
-        setPlayers(response.data);
-      } catch (error) {
-        console.error('Error fetching players:', error);
-      }
-    };
-    fetchPlayers();
+    if (typeof window !== 'undefined') {
+      const fetchPlayers = async () => {
+        try {
+          const response = await axios.get('/api/get-players');
+          setPlayers(response.data);
+        } catch (error) {
+          console.error('Error fetching players:', error);
+        }
+      };
+      fetchPlayers();
+    }
   }, []);
 
   // Mock authentication for simplicity
