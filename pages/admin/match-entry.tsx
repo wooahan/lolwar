@@ -158,12 +158,13 @@ const MatchEntry = () => {
                             padding: '10px',
                             minHeight: '100px',
                             marginBottom: '10px',
+                            backgroundColor: '#f9f9f9',
                           }}
                         >
-                          <strong>{position}</strong>
+                          <strong>{position.toUpperCase()}</strong>
                           {teamIndex === 0
                             ? teamAPlayers[position] && (
-                                <div style={{ padding: '5px', backgroundColor: '#d0e8ff' }}>
+                                <div style={{ padding: '5px', backgroundColor: '#d0e8ff', marginTop: '5px' }}>
                                   {teamAPlayers[position].name} ({teamAPlayers[position].nickname})
                                   <div>
                                     <input
@@ -192,7 +193,7 @@ const MatchEntry = () => {
                                 </div>
                               )
                             : teamBPlayers[position] && (
-                                <div style={{ padding: '5px', backgroundColor: '#ffd0d0' }}>
+                                <div style={{ padding: '5px', backgroundColor: '#ffd0d0', marginTop: '5px' }}>
                                   {teamBPlayers[position].name} ({teamBPlayers[position].nickname})
                                   <div>
                                     <input
