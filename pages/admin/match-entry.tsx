@@ -122,13 +122,12 @@ const MatchEntry = () => {
                               style={{
                                 userSelect: 'none',
                                 padding: '10px',
-                                margin: '0 0 8px 0',
                                 backgroundColor: '#f0f0f0',
                                 textAlign: 'center',
                                 ...provided.draggableProps.style,
                               }}
                             >
-                              {player.name}
+                              {player.name} ({player.nickname})
                             </div>
                           )}
                         </Draggable>
@@ -159,7 +158,7 @@ const MatchEntry = () => {
                     <h2>A팀</h2>
                     {teamAPlayers.map((player, index) => (
                       <div key={index} style={{ padding: '5px', backgroundColor: '#d0e8ff' }}>
-                        {player.name}
+                        {player.name} ({player.nickname})
                         <div>
                           <input
                             {...register(`teamA.${player.name}.position`)}
@@ -209,7 +208,7 @@ const MatchEntry = () => {
                     <h2>B팀</h2>
                     {teamBPlayers.map((player, index) => (
                       <div key={index} style={{ padding: '5px', backgroundColor: '#ffd0d0' }}>
-                        {player.name}
+                        {player.name} ({player.nickname})
                         <div>
                           <input
                             {...register(`teamB.${player.name}.position`)}
