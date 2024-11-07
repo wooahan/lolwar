@@ -11,6 +11,8 @@ const MatchEntry = () => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [teamAPlayers, setTeamAPlayers] = useState([]);
+  const [teamBPlayers, setTeamBPlayers] = useState([]);
 
   // Load players from local storage on component mount
   useEffect(() => {
@@ -43,12 +45,14 @@ const MatchEntry = () => {
 
     const { source, destination } = result;
 
-    // Clone players array to modify
-    const updatedPlayers = Array.from(players);
-    const [removed] = updatedPlayers.splice(source.index, 1);
-    updatedPlayers.splice(destination.index, 0, removed);
-
-    setPlayers(updatedPlayers);
+    // Dragging from players list
+    if (source.droppableId === 'players' && destination.droppableId === 'teamA') {
+      const player = players[source.index];
+      setTeamAPlayers((prev) => [...prev, player]);
+    } else if (source.droppableId === 'players' && destination.droppableId === 'teamB') {
+      const player = players[source.index];
+      setTeamBPlayers((prev) => [...prev, player]);
+    }
   };
 
   if (!isAuthenticated) {
@@ -123,6 +127,55 @@ const MatchEntry = () => {
           </div>
         </div>
         <div style={{ flex: 2 }}>
+          {/* 드래그 앤 드롭 팀 영역 */}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <Droppable droppableId="teamA">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    style={{
+                      border: '1px solid blue',
+                      padding: '10px',
+                      height: '200px',
+                      width: '100%',
+                    }}
+                  >
+                    <h2>A팀</h2>
+                    {teamAPlayers.map((player, index) => (
+                      <div key={index} style={{ padding: '5px', backgroundColor: '#d0e8ff' }}>
+                        {player.name}
+                      </div>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+              <Droppable droppableId="teamB">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    style={{
+                      border: '1px solid red',
+                      padding: '10px',
+                      height: '200px',
+                      width: '100%',
+                    }}
+                  >
+                    <h2>B팀</h2>
+                    {teamBPlayers.map((player, index) => (
+                      <div key={index} style={{ padding: '5px', backgroundColor: '#ffd0d0' }}>
+                        {player.name}
+                      </div>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </div>
+          </DragDropContext>
           {/* 경기 입력 폼 */}
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Match Time Selection */}
@@ -139,82 +192,6 @@ const MatchEntry = () => {
                 <option value="4차">4차</option>
               </select>
             </div>
-
-            {/* Team A Input */}
-            <h2>A팀</h2>
-            {['탑', '정글', '미드', '원딜', '서폿'].map((position, index) => (
-              <div key={index}>
-                <label>{position}</label>
-                <select {...register(`teamA.${position}`, { required: true })}>
-                  <option value="">선수 선택</option>
-                  {players.map((player) => (
-                    <option key={player.id} value={player.name}>
-                      {player.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  {...register(`teamA.${position}Kill`)}
-                  placeholder="킬"
-                  type="number"
-                  min="0"
-                />
-                <input
-                  {...register(`teamA.${position}Death`)}
-                  placeholder="데스"
-                  type="number"
-                  min="0"
-                />
-                <input
-                  {...register(`teamA.${position}Assist`)}
-                  placeholder="어시스트"
-                  type="number"
-                  min="0"
-                />
-                <input
-                  {...register(`teamA.${position}Champion`)}
-                  placeholder="사용한 챔피언"
-                />
-              </div>
-            ))}
-
-            {/* Team B Input */}
-            <h2>B팀</h2>
-            {['탑', '정글', '미드', '원딜', '서폿'].map((position, index) => (
-              <div key={index}>
-                <label>{position}</label>
-                <select {...register(`teamB.${position}`, { required: true })}>
-                  <option value="">선수 선택</option>
-                  {players.map((player) => (
-                    <option key={player.id} value={player.name}>
-                      {player.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  {...register(`teamB.${position}Kill`)}
-                  placeholder="킬"
-                  type="number"
-                  min="0"
-                />
-                <input
-                  {...register(`teamB.${position}Death`)}
-                  placeholder="데스"
-                  type="number"
-                  min="0"
-                />
-                <input
-                  {...register(`teamB.${position}Assist`)}
-                  placeholder="어시스트"
-                  type="number"
-                  min="0"
-                />
-                <input
-                  {...register(`teamB.${position}Champion`)}
-                  placeholder="사용한 챔피언"
-                />
-              </div>
-            ))}
 
             {/* Match Result */}
             <div>
