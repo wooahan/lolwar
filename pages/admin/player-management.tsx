@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import Link from 'next/link';
 
 const PlayerManagement = () => {
   const router = useRouter();
@@ -69,9 +68,7 @@ const PlayerManagement = () => {
   return (
     <div>
       <h1>선수 관리</h1>
-      <Link href="/">
-        <a>홈으로 돌아가기</a>
-      </Link>
+      <a href="/">홈으로 돌아가기</a>
       <form onSubmit={handleSubmit(onSubmit)}>
         <input {...register('id')} type="hidden" />
         <div>
@@ -128,7 +125,7 @@ const HomePage = () => {
         <ul>
           <li>
             <Link href="/admin/player-management">
-              <a>선수 관리</a>
+              선수 관리
             </Link>
           </li>
         </ul>
