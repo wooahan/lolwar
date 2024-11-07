@@ -20,7 +20,6 @@ const MatchEntry = () => {
     const fetchPlayers = async () => {
       try {
         const response = await axios.get('/api/get-players');
-        console.log('Fetched players:', response.data); // Fetch된 데이터를 콘솔에 출력하여 확인합니다.
         setPlayers(response.data);
       } catch (error) {
         console.error('Error fetching players:', error);
@@ -125,10 +124,16 @@ const MatchEntry = () => {
                               padding: '10px',
                               backgroundColor: '#f0f0f0',
                               textAlign: 'center',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                               ...provided.draggableProps.style,
                             }}
                           >
-                            {player.name} ({player.nickname})
+                            {player.name}
+                            <br />
+                            ({player.nickname})
                           </div>
                         )}
                       </Draggable>
@@ -148,7 +153,7 @@ const MatchEntry = () => {
                   <h2>{team}</h2>
                   {['top', 'jungle', 'mid', 'adc', 'support'].map((position) => (
                     <Droppable key={position} droppableId={`${teamIndex === 0 ? 'teamA' : 'teamB'}-${position}`}>
-                      {(provided) => (
+                      {(provided, snapshot) => (
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
@@ -157,7 +162,8 @@ const MatchEntry = () => {
                             padding: '10px',
                             minHeight: '100px',
                             marginBottom: '10px',
-                            backgroundColor: '#f9f9f9',
+                            backgroundColor: snapshot.isDraggingOver ? '#e0e0e0' : '#f9f9f9',
+                            transition: 'background-color 0.3s ease',
                           }}
                         >
                           <strong>{position.toUpperCase()}</strong>
