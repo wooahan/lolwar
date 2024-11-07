@@ -1,6 +1,7 @@
-// File: firebaseConfig.ts
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+// File: pages/api/firebaseConfig.js
+
+const { initializeApp } = require('firebase/app');
+const { getFirestore } = require('firebase/firestore');
 
 const firebaseConfig = {
   apiKey: "AIzaSyCc8PxK2BDhPpi1PEp2yfzKTtd_A3ITRuE",
@@ -18,4 +19,4 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firestore
 const db = getFirestore(app);
 
-export { db };
+module.exports = { db, firebaseConfig };

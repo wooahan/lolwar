@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+keys/serviceAccountKey.json  # Firebase 비공개 키 파일
 
 # debug
 npm-debug.log*
