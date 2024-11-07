@@ -99,6 +99,9 @@ const MatchEntry = () => {
               padding: '10px',
               height: '400px',
               overflowY: 'scroll',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(6, 1fr)',
+              gap: '10px',
             }}
           >
             <DragDropContext onDragEnd={onDragEnd}>
@@ -121,6 +124,7 @@ const MatchEntry = () => {
                                 padding: '10px',
                                 margin: '0 0 8px 0',
                                 backgroundColor: '#f0f0f0',
+                                textAlign: 'center',
                                 ...provided.draggableProps.style,
                               }}
                             >
@@ -157,6 +161,10 @@ const MatchEntry = () => {
                       <div key={index} style={{ padding: '5px', backgroundColor: '#d0e8ff' }}>
                         {player.name}
                         <div>
+                          <input
+                            {...register(`teamA.${player.name}.position`)}
+                            placeholder="라인"
+                          />
                           <input
                             {...register(`teamA.${player.name}.kill`)}
                             placeholder="킬"
@@ -203,6 +211,10 @@ const MatchEntry = () => {
                       <div key={index} style={{ padding: '5px', backgroundColor: '#ffd0d0' }}>
                         {player.name}
                         <div>
+                          <input
+                            {...register(`teamB.${player.name}.position`)}
+                            placeholder="라인"
+                          />
                           <input
                             {...register(`teamB.${player.name}.kill`)}
                             placeholder="킬"
