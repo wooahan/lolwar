@@ -25,8 +25,23 @@ const PlayerManagement = () => {
   // Firestore 컬렉션 참조 생성
   const playersCollection = collection(db, '선수 정보');
 
-  // 실시간 데이터 동기화를 위해 onSnapshot 사용
+  // 데이터 불러오기와 실시간 데이터 동기화를 위해 onSnapshot 사용
   useEffect(() => {
+    const fetchPlayers = async () => {
+      try {
+        const playerSnapshot = await getDocs(playersCollection);
+        const playerList = playerSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPlayers(playerList);
+      } catch (error) {
+        console.error('Error fetching players: ', error);
+      }
+    };
+
+    fetchPlayers();
+
     const unsubscribe = onSnapshot(playersCollection, (snapshot) => {
       const playerList = snapshot.docs.map((doc) => ({
         id: doc.id,
