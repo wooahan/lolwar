@@ -123,6 +123,7 @@ const MatchEntry = () => {
                                 padding: '10px',
                                 backgroundColor: '#f0f0f0',
                                 textAlign: 'center',
+                                marginBottom: '10px',
                                 ...provided.draggableProps.style,
                               }}
                             >
