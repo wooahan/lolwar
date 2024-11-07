@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
 
 const PlayerManagement = () => {
   const router = useRouter();
@@ -11,12 +12,23 @@ const PlayerManagement = () => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Load players from local storage on component mount
+  useEffect(() => {
+    const storedPlayers = JSON.parse(localStorage.getItem('players') || '[]');
+    setPlayers(storedPlayers);
+  }, []);
+
+  // Save players to local storage whenever the players list changes
+  useEffect(() => {
+    localStorage.setItem('players', JSON.stringify(players));
+  }, [players]);
+
   // Mock authentication for simplicity
   const authenticate = () => {
     if (password === '1717') {
       setIsAuthenticated(true);
     } else {
-      alert('Invalid password!');
+      alert('잘못된 비밀번호입니다!');
     }
   };
 
@@ -42,54 +54,61 @@ const PlayerManagement = () => {
   if (!isAuthenticated) {
     return (
       <div>
-        <h2>Admin Login</h2>
+        <h2>관리자 로그인</h2>
         <input
           type="password"
-          placeholder="Enter admin password"
+          placeholder="관리자 비밀번호 입력"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button onClick={authenticate}>Login</button>
+        <button onClick={authenticate}>로그인</button>
       </div>
     );
   }
 
   return (
     <div>
-      <h1>Player Management</h1>
-      <a href="/">Back to Home</a> {/* Link를 사용하지 않고 a 태그로 대체 */}
+      <h1>선수 관리</h1>
+      <Link href="/">
+        <a>홈으로 돌아가기</a>
+      </Link>
       <form onSubmit={handleSubmit(onSubmit)}>
         <input {...register('id')} type="hidden" />
         <div>
-          <label>Nickname</label>
-          <input {...register('nickname', { required: true })} placeholder="Nickname" />
+          <label>이름</label>
+          <input {...register('name', { required: true })} placeholder="이름" />
         </div>
         <div>
-          <label>Main Position</label>
-          <input {...register('mainPosition', { required: true })} placeholder="Main Position" />
+          <label>닉네임</label>
+          <input {...register('nickname', { required: true })} placeholder="닉네임" />
         </div>
         <div>
-          <label>Secondary Position</label>
-          <input {...register('secondaryPosition')} placeholder="Secondary Position" />
+          <label>메인 포지션</label>
+          <input {...register('mainPosition', { required: true })} placeholder="메인 포지션" />
         </div>
-        <button type="submit">Add/Update Player</button>
+        <div>
+          <label>서브 포지션</label>
+          <input {...register('secondaryPosition')} placeholder="서브 포지션" />
+        </div>
+        <button type="submit">선수 추가/수정</button>
       </form>
       <div>
-        <h2>Players List</h2>
+        <h2>선수 목록</h2>
         {players.length > 0 ? (
           <ul>
             {players.map((player) => (
               <li key={player.id}>
-                <p>{player.nickname}</p>
-                <p>Main Position: {player.mainPosition}</p>
-                <p>Secondary Position: {player.secondaryPosition}</p>
-                <button onClick={() => reset(player)}>Edit</button>
-                <button onClick={() => deletePlayer(player.id)}>Delete</button>
+                <p>이름: {player.name}</p>
+                <p>닉네임: {player.nickname}</p>
+                <p>메인 포지션: {player.mainPosition}</p>
+                <p>서브 포지션: {player.secondaryPosition}</p>
+                <button onClick={() => reset(player)}>수정</button>
+                <button onClick={() => deletePlayer(player.id)}>삭제</button>
               </li>
             ))}
           </ul>
         ) : (
-          <p>No players registered yet.</p>
+          <p>등록된 선수가 없습니다.</p>
         )}
       </div>
     </div>
@@ -97,3 +116,25 @@ const PlayerManagement = () => {
 };
 
 export default PlayerManagement;
+
+// File: pages/index.tsx (Main Page)
+import Link from 'next/link';
+
+const HomePage = () => {
+  return (
+    <div>
+      <h1>롤 내전 전적 관리 서비스</h1>
+      <nav>
+        <ul>
+          <li>
+            <Link href="/admin/player-management">
+              <a>선수 관리</a>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
+};
+
+export default HomePage;
