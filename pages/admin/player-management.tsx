@@ -4,8 +4,15 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { db } from '@/firebaseConfig';
-import admin from 'firebase-admin';
+import { db } from '../../firebaseClient'; // firebaseClient 경로에 맞게 설정
+import {
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
 
 const PlayerManagement = () => {
   const router = useRouter();
@@ -14,13 +21,14 @@ const PlayerManagement = () => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const playersCollection = db.collection('선수 정보'); // Firebase Firestore 컬렉션 참조
+  // Firestore 컬렉션 참조 생성
+  const playersCollection = collection(db, '선수 정보');
 
-  // Firestore에서 선수 정보 가져오기
+  // Load players from Firestore on component mount
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const playerSnapshot = await playersCollection.get();
+        const playerSnapshot = await getDocs(playersCollection);
         const playerList = playerSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -33,7 +41,7 @@ const PlayerManagement = () => {
     fetchPlayers();
   }, []);
 
-  // 관리자 인증을 위한 함수
+  // Mock authentication for simplicity
   const authenticate = () => {
     if (password === '1717') {
       setIsAuthenticated(true);
@@ -42,13 +50,13 @@ const PlayerManagement = () => {
     }
   };
 
-  // 선수 추가 또는 업데이트 처리
+  // Handler to add or update player information
   const onSubmit = async (data) => {
     try {
       if (data.id) {
-        // 선수 정보 업데이트 로직
-        const playerDoc = playersCollection.doc(data.id);
-        await playerDoc.update({
+        // Update player logic here
+        const playerDoc = doc(db, '선수 정보', data.id);
+        await updateDoc(playerDoc, {
           name: data.name,
           nickname: data.nickname,
           mainPosition: data.mainPosition,
@@ -56,20 +64,18 @@ const PlayerManagement = () => {
           tier: data.tier,
         });
         setPlayers((prev) =>
-          prev.map((player) =>
-            player.id === data.id ? { ...player, ...data } : player
-          )
+          prev.map((player) => (player.id === data.id ? { ...player, ...data } : player))
         );
       } else {
-        // 신규 선수 추가 로직
-        const newPlayerRef = await playersCollection.add({
+        // Add new player logic here
+        const docRef = await addDoc(playersCollection, {
           name: data.name,
           nickname: data.nickname,
           mainPosition: data.mainPosition,
           secondaryPosition: data.secondaryPosition,
           tier: data.tier,
         });
-        setPlayers((prev) => [...prev, { ...data, id: newPlayerRef.id }]);
+        setPlayers((prev) => [...prev, { ...data, id: docRef.id }]);
       }
       reset();
     } catch (error) {
@@ -77,18 +83,17 @@ const PlayerManagement = () => {
     }
   };
 
-  // 선수 삭제 처리
+  // Handler to delete player
   const deletePlayer = async (id) => {
     try {
-      const playerDoc = playersCollection.doc(id);
-      await playerDoc.delete();
+      const playerDoc = doc(db, '선수 정보', id);
+      await deleteDoc(playerDoc);
       setPlayers((prev) => prev.filter((player) => player.id !== id));
     } catch (error) {
       console.error('Error deleting player: ', error);
     }
   };
 
-  // 수정 버튼 클릭 시 선수 정보 설정
   const handleEdit = (player) => {
     setValue('id', player.id);
     setValue('name', player.name);
@@ -127,10 +132,7 @@ const PlayerManagement = () => {
         </div>
         <div>
           <label>닉네임</label>
-          <input
-            {...register('nickname', { required: true })}
-            placeholder="닉네임"
-          />
+          <input {...register('nickname', { required: true })} placeholder="닉네임" />
         </div>
         <div>
           <label>메인 포지션</label>
