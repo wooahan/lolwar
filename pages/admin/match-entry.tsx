@@ -1,9 +1,9 @@
+// File: pages/admin/match-entry.tsx
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { db } from '@/firebaseClient';
-import { collection, getDocs } from 'firebase/firestore';
+import axios from 'axios';
 
 const MatchEntry = () => {
   const router = useRouter();
@@ -15,13 +15,12 @@ const MatchEntry = () => {
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
 
-  // Load players from Firestore on component mount
+  // Load players from API on component mount
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, '선수 정보'));
-        const playerList = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setPlayers(playerList);
+        const response = await axios.get('/api/get-players');
+        setPlayers(response.data);
       } catch (error) {
         console.error('Error fetching players: ', error);
       }
