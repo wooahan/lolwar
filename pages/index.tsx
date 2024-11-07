@@ -1,13 +1,10 @@
 // File: pages/index.tsx
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
-import Image from 'next/image';
-import styles from '../styles/Home.module.css';
 
 const Home = () => {
   const [players, setPlayers] = useState<string[]>([]);
-  const [matches, setMatches] = useState<any[]>([]);
+  const [matches, setMatches] = useState<{ player1: string; player2: string; winner: string }[]>([]);
   const [messageBoard, setMessageBoard] = useState<string[]>([]);
   const [message, setMessage] = useState('');
 
@@ -29,7 +26,7 @@ const Home = () => {
     localStorage.setItem('players', JSON.stringify(updatedPlayers));
   };
 
-  const addMatch = (matchDetails: any) => {
+  const addMatch = (matchDetails: { player1: string; player2: string; winner: string }) => {
     const updatedMatches = [...matches, matchDetails];
     setMatches(updatedMatches);
     localStorage.setItem('matches', JSON.stringify(updatedMatches));
