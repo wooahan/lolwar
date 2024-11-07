@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import Link from 'next/link';
 
 const PlayerManagement = () => {
   const router = useRouter();
@@ -14,7 +13,7 @@ const PlayerManagement = () => {
 
   // Mock authentication for simplicity
   const authenticate = () => {
-    if (password === '1717') { // Change 'adminpassword' to a secure password
+    if (password === '1717') {
       setIsAuthenticated(true);
     } else {
       alert('Invalid password!');
@@ -58,9 +57,7 @@ const PlayerManagement = () => {
   return (
     <div>
       <h1>Player Management</h1>
-      <Link href="/">
-        <a>Back to Home</a>
-      </Link>
+      <a href="/">Back to Home</a> {/* Link를 사용하지 않고 a 태그로 대체 */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <input {...register('id')} type="hidden" />
         <div>
@@ -100,25 +97,3 @@ const PlayerManagement = () => {
 };
 
 export default PlayerManagement;
-
-// File: pages/index.tsx (Main Page)
-import Link from 'next/link';
-
-const HomePage = () => {
-  return (
-    <div>
-      <h1>Welcome to In-House League Management</h1>
-      <nav>
-        <ul>
-          <li>
-            <Link href="/admin/player-management">
-              <a>선수 관리</a>
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  );
-};
-
-export default HomePage;
