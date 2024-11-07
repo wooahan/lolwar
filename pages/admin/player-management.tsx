@@ -10,7 +10,7 @@ import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase
 const PlayerManagement = () => {
   const router = useRouter();
   const [players, setPlayers] = useState([]);
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, setValue } = useForm();
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -19,9 +19,13 @@ const PlayerManagement = () => {
   // Load players from Firestore on component mount
   useEffect(() => {
     const fetchPlayers = async () => {
-      const playerSnapshot = await getDocs(playersCollection);
-      const playerList = playerSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setPlayers(playerList);
+      try {
+        const playerSnapshot = await getDocs(playersCollection);
+        const playerList = playerSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setPlayers(playerList);
+      } catch (error) {
+        console.error('Error fetching players: ', error);
+      }
     };
     fetchPlayers();
   }, []);
@@ -37,24 +41,53 @@ const PlayerManagement = () => {
 
   // Handler to add or update player information
   const onSubmit = async (data) => {
-    if (data.id) {
-      // Update player logic here
-      const playerDoc = doc(db, '선수 정보', data.id);
-      await updateDoc(playerDoc, data);
-      setPlayers((prev) => prev.map((player) => (player.id === data.id ? { ...player, ...data } : player)));
-    } else {
-      // Add new player logic here
-      const docRef = await addDoc(playersCollection, data);
-      setPlayers((prev) => [...prev, { ...data, id: docRef.id }]);
+    try {
+      if (data.id) {
+        // Update player logic here
+        const playerDoc = doc(db, '선수 정보', data.id);
+        await updateDoc(playerDoc, {
+          name: data.name,
+          nickname: data.nickname,
+          mainPosition: data.mainPosition,
+          secondaryPosition: data.secondaryPosition,
+          tier: data.tier,
+        });
+        setPlayers((prev) => prev.map((player) => (player.id === data.id ? { ...player, ...data } : player)));
+      } else {
+        // Add new player logic here
+        const docRef = await addDoc(playersCollection, {
+          name: data.name,
+          nickname: data.nickname,
+          mainPosition: data.mainPosition,
+          secondaryPosition: data.secondaryPosition,
+          tier: data.tier,
+        });
+        setPlayers((prev) => [...prev, { ...data, id: docRef.id }]);
+      }
+      reset();
+    } catch (error) {
+      console.error('Error adding/updating player: ', error);
     }
-    reset();
   };
 
   // Handler to delete player
   const deletePlayer = async (id) => {
-    const playerDoc = doc(db, '선수 정보', id);
-    await deleteDoc(playerDoc);
-    setPlayers((prev) => prev.filter((player) => player.id !== id));
+    try {
+      const playerDoc = doc(db, '선수 정보', id);
+      await deleteDoc(playerDoc);
+      setPlayers((prev) => prev.filter((player) => player.id !== id));
+    } catch (error) {
+      console.error('Error deleting player: ', error);
+    }
+  };
+
+  const handleEdit = (player) => {
+    setValue('id', player.id);
+    setValue('name', player.name);
+    setValue('nickname', player.nickname);
+    setValue('mainPosition', player.mainPosition);
+    setValue('secondaryPosition', player.secondaryPosition);
+    setValue('tier', player.tier);
   };
 
   if (!isAuthenticated) {
@@ -140,7 +173,7 @@ const PlayerManagement = () => {
                 <p>메인 포지션: {player.mainPosition}</p>
                 <p>서브 포지션: {player.secondaryPosition}</p>
                 <p>티어: {player.tier}</p>
-                <button onClick={() => reset(player)}>수정</button>
+                <button onClick={() => handleEdit(player)}>수정</button>
                 <button onClick={() => deletePlayer(player.id)}>삭제</button>
               </li>
             ))}
