@@ -62,7 +62,7 @@ const Home = () => {
               <a className="px-4 py-2 bg-green-500 text-white rounded mb-4 sm:mb-0">랭킹</a>
             </Link>
             <Link href="/results">
-              <a className="px-4 py-2 bg-green-500 text-white rounded mb-4 sm:mb-0">내전 결과</a>
+              <a className="px-4 py-2 bg-green-500 text-white rounded mb-4 sm:mb-0">내전 기록</a>
             </Link>
             <Link href="/board">
               <a className="px-4 py-2 bg-green-500 text-white rounded">일일 게시판</a>
