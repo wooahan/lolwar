@@ -3,8 +3,12 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 
 const Home = () => {
-  const [recentMatches, setRecentMatches] = useState<{ player1: string; player2: string; winner: string }[]>([]);
-  const [mainStats, setMainStats] = useState<{ totalGames: number; winRate: number; avgKDA: string }>({ totalGames: 0, winRate: 0, avgKDA: '0/0/0' });
+  const [recentMatches, setRecentMatches] = useState<Array<{ player1: string; player2: string; winner: string }>>([]);
+  const [mainStats, setMainStats] = useState<{ totalGames: number; winRate: number; avgKDA: string }>({
+    totalGames: 0,
+    winRate: 0,
+    avgKDA: '0/0/0',
+  });
 
   // Fetch recent matches and main stats from local storage or any database you might be using
   useEffect(() => {
@@ -16,7 +20,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className={` flex flex-col items-center justify-center min-h-screen bg-gray-100`}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Head>
         <title>롤 내전 전적 관리 서비스</title>
       </Head>
