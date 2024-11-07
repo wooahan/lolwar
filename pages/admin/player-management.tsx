@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
+import { db } from '../api/firebaseConfig';
+import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
 const PlayerManagement = () => {
   const router = useRouter();
@@ -12,16 +14,17 @@ const PlayerManagement = () => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Load players from local storage on component mount
-  useEffect(() => {
-    const storedPlayers = JSON.parse(localStorage.getItem('players') || '[]');
-    setPlayers(storedPlayers);
-  }, []);
+  const playersCollection = collection(db, '선수 정보');
 
-  // Save players to local storage whenever the players list changes
+  // Load players from Firestore on component mount
   useEffect(() => {
-    localStorage.setItem('players', JSON.stringify(players));
-  }, [players]);
+    const fetchPlayers = async () => {
+      const playerSnapshot = await getDocs(playersCollection);
+      const playerList = playerSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setPlayers(playerList);
+    };
+    fetchPlayers();
+  }, []);
 
   // Mock authentication for simplicity
   const authenticate = () => {
@@ -33,21 +36,24 @@ const PlayerManagement = () => {
   };
 
   // Handler to add or update player information
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (data.id) {
       // Update player logic here
-      setPlayers((prev) =>
-        prev.map((player) => (player.id === data.id ? { ...player, ...data } : player))
-      );
+      const playerDoc = doc(db, '선수 정보', data.id);
+      await updateDoc(playerDoc, data);
+      setPlayers((prev) => prev.map((player) => (player.id === data.id ? { ...player, ...data } : player)));
     } else {
       // Add new player logic here
-      setPlayers((prev) => [...prev, { ...data, id: Date.now() }]);
+      const docRef = await addDoc(playersCollection, data);
+      setPlayers((prev) => [...prev, { ...data, id: docRef.id }]);
     }
     reset();
   };
 
   // Handler to delete player
-  const deletePlayer = (id) => {
+  const deletePlayer = async (id) => {
+    const playerDoc = doc(db, '선수 정보', id);
+    await deleteDoc(playerDoc);
     setPlayers((prev) => prev.filter((player) => player.id !== id));
   };
 
