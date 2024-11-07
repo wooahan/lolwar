@@ -93,52 +93,51 @@ const MatchEntry = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div
-            style={{
-              border: '1px solid black',
-              padding: '10px',
-              height: '400px',
-              overflowY: 'scroll',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(6, 1fr)',
-              gap: '10px',
-            }}
-          >
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="players">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {players
-                      .filter((player) =>
-                        player.name.toLowerCase().includes(searchTerm.toLowerCase())
-                      )
-                      .map((player, index) => (
-                        <Draggable key={player.id} draggableId={player.id} index={index}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={{
-                                userSelect: 'none',
-                                padding: '10px',
-                                backgroundColor: '#f0f0f0',
-                                textAlign: 'center',
-                                marginBottom: '10px',
-                                ...provided.draggableProps.style,
-                              }}
-                            >
-                              {player.name} ({player.nickname})
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </div>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="players">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  style={{
+                    border: '1px solid black',
+                    padding: '10px',
+                    height: '400px',
+                    overflowY: 'scroll',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(6, 1fr)',
+                    gap: '10px',
+                  }}
+                >
+                  {players
+                    .filter((player) =>
+                      player.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((player, index) => (
+                      <Draggable key={player.id} draggableId={player.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={{
+                              userSelect: 'none',
+                              padding: '10px',
+                              backgroundColor: '#f0f0f0',
+                              textAlign: 'center',
+                              ...provided.draggableProps.style,
+                            }}
+                          >
+                            {player.name} ({player.nickname})
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </div>
         <div style={{ flex: 2 }}>
           {/* 드래그 앤 드롭 팀 영역 */}
