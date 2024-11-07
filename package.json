@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@netlify/plugin-nextjs": "^5.8.1",
     "@typescript-eslint/eslint-plugin": "^8.13.0",
     "@typescript-eslint/parser": "^8.13.0",
     "axios": "^1.7.7",

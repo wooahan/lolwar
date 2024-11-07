@@ -7,14 +7,19 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // 빌드 시 ESLint 경고 무시
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.alias['@'] = path.resolve(__dirname);
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      net: false,
-      http2: false,
-    };
+
+    // 클라이언트에서 fs, net, http2 사용 방지
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        http2: false,
+      };
+    }
+
     return config;
   },
 };
