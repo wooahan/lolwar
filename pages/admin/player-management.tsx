@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { db } from '../api/firebaseConfig';
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../../api/firebaseConfig'; // firebaseConfig 경로 수정
+import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase-admin/firestore';
 
 const PlayerManagement = () => {
   const router = useRouter();
@@ -14,12 +14,11 @@ const PlayerManagement = () => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const playersCollection = collection(db, '선수 정보');
-
   // Load players from Firestore on component mount
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
+        const playersCollection = collection(db, '선수 정보');
         const playerSnapshot = await getDocs(playersCollection);
         const playerList = playerSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setPlayers(playerList);
@@ -55,6 +54,7 @@ const PlayerManagement = () => {
         setPlayers((prev) => prev.map((player) => (player.id === data.id ? { ...player, ...data } : player)));
       } else {
         // Add new player logic here
+        const playersCollection = collection(db, '선수 정보');
         const docRef = await addDoc(playersCollection, {
           name: data.name,
           nickname: data.nickname,
