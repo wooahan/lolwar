@@ -168,6 +168,10 @@ const MatchEntry = () => {
                                   {teamAPlayers[position].name} ({teamAPlayers[position].nickname})
                                   <div>
                                     <input
+                                      {...register(`teamA.${position}.player`, { value: teamAPlayers[position].name })}
+                                      type="hidden"
+                                    />
+                                    <input
                                       {...register(`teamA.${position}.kill`)}
                                       placeholder="킬"
                                       type="number"
@@ -196,6 +200,10 @@ const MatchEntry = () => {
                                 <div style={{ padding: '5px', backgroundColor: '#ffd0d0', marginTop: '5px' }}>
                                   {teamBPlayers[position].name} ({teamBPlayers[position].nickname})
                                   <div>
+                                    <input
+                                      {...register(`teamB.${position}.player`, { value: teamBPlayers[position].name })}
+                                      type="hidden"
+                                    />
                                     <input
                                       {...register(`teamB.${position}.kill`)}
                                       placeholder="킬"
