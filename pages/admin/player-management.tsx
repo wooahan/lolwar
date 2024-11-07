@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { db } from '../../pages/api/firebaseConfig'; // 정확한 경로로 수정
+import { db } from '@/pages/api/firebaseConfig'; // 절대 경로로 수정
 import admin from 'firebase-admin';
 
 const PlayerManagement = () => {
