@@ -184,7 +184,14 @@ const MatchEntry = () => {
                           )}
                           {teamIndex === 0
                             ? teamAPlayers[position] && (
-                                <div style={{ padding: '5px', backgroundColor: '#d0e8ff', marginTop: '5px' }}>
+                                <div
+                                  style={{
+                                    padding: '5px',
+                                    backgroundColor: '#d0e8ff',
+                                    marginTop: '5px',
+                                    textAlign: 'center',
+                                  }}
+                                >
                                   {teamAPlayers[position].name}
                                   <br />
                                   ({teamAPlayers[position].nickname})
@@ -219,7 +226,14 @@ const MatchEntry = () => {
                                 </div>
                               )
                             : teamBPlayers[position] && (
-                                <div style={{ padding: '5px', backgroundColor: '#ffd0d0', marginTop: '5px' }}>
+                                <div
+                                  style={{
+                                    padding: '5px',
+                                    backgroundColor: '#ffd0d0',
+                                    marginTop: '5px',
+                                    textAlign: 'center',
+                                  }}
+                                >
                                   {teamBPlayers[position].name}
                                   <br />
                                   ({teamBPlayers[position].nickname})
