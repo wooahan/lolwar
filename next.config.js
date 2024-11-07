@@ -12,7 +12,10 @@ const nextConfig = {
   },
   webpack: (config) => {
     // 절대 경로를 사용할 수 있도록 alias 설정 추가
-    config.resolve.alias['@'] = path.resolve(__dirname);
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname),
+    };
     return config;
   },
 };
