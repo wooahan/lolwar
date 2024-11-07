@@ -20,9 +20,10 @@ const MatchEntry = () => {
     const fetchPlayers = async () => {
       try {
         const response = await axios.get('/api/get-players');
+        console.log('Fetched players:', response.data); // Fetch된 데이터를 콘솔에 출력하여 확인합니다.
         setPlayers(response.data);
       } catch (error) {
-        console.error('Error fetching players: ', error);
+        console.error('Error fetching players:', error);
       }
     };
     fetchPlayers();
