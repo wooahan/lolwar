@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build --no-cache"  # 캐시 없이 빌드하기 위한 명령어
   publish = ".next"
 
 [[redirects]]
