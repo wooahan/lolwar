@@ -5,6 +5,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import DraggablePlayer from './DraggablePlayer';
 import DropBox from './Dropbox';
+import ChampionEntry from './ChampionEntry';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { db } from '@/firebaseClient';
 
@@ -143,13 +144,16 @@ const MatchEntry = () => {
                   <DraggablePlayer key={player.id} player={player} />
                 ))}
             </div>
+
+            {/* 챔피언 목록 추가 */}
+            <ChampionEntry />
           </div>
           <div style={{ flex: 2 }}>
             {/* 드래그 앤 드롭 팀 영역 */}
             <div style={{ display: 'flex', gap: '20px' }}>
               {['A팀', 'B팀'].map((team, teamIndex) => (
                 <div key={teamIndex} style={{ flex: 1 }}>
-                  <h2>{team}</h2>
+                  <h2 style={{ marginBottom: '10px' }}>{team}</h2>
                   {['top', 'jungle', 'mid', 'adc', 'support'].map((position) => (
                     <DropBox
                       key={position}
@@ -171,7 +175,7 @@ const MatchEntry = () => {
           </div>
         </div>
         {/* 경기 입력 폼 */}
-        <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', alignSelf: 'flex-start' }}>
+        <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', alignSelf: 'flex-start', marginLeft: '20px' }}>
           {/* Match Time Selection */}
           <div style={{ marginBottom: '10px' }}>
             <label>내전 시간</label>
