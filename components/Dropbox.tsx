@@ -6,15 +6,22 @@ interface DropBoxProps {
   team: any;
   onDropPlayer: (player: any) => void;
   onRemovePlayer: (position: string) => void;
+  onDropChampion: (champion: any, position: string, teamType: string) => void;
   register: any;
   teamType: 'A' | 'B';
 }
 
-const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemovePlayer, register, teamType }) => {
+const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemovePlayer, onDropChampion, register, teamType }) => {
   const dropRef = useRef(null);
   const [{ isOver }, drop] = useDrop({
-    accept: 'PLAYER',
-    drop: (item: any) => onDropPlayer(item),
+    accept: ['PLAYER', 'CHAMPION'],
+    drop: (item: any) => {
+      if (item.type === 'PLAYER') {
+        onDropPlayer(item);
+      } else if (item.type === 'CHAMPION') {
+        onDropChampion(item, position, teamType);
+      }
+    },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
@@ -117,14 +124,27 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemov
             min="0"
             style={{ width: '60px' }}
           />
-          <input
-            {...register(`${teamType}.${position}.champion`)}
-            placeholder="사용한 챔피언"
-            type="text"
-            style={{ width: '100px' }}
-          />
         </div>
       )}
+      {/* Champion Drop Box */}
+      <div
+        style={{
+          border: '1px dashed #aaa',
+          padding: '10px',
+          width: '100px',
+          height: '80px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+        }}
+      >
+        {team[position]?.champion ? (
+          <img src={team[position].champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
+        ) : (
+          <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
+        )}
+      </div>
     </div>
   );
 };

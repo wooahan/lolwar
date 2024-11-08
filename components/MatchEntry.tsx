@@ -1,200 +1,154 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import axios from 'axios';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import DraggablePlayer from './DraggablePlayer';
-import DropBox from './Dropbox';
-import ChampionEntry from './ChampionEntry';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { db } from '@/firebaseClient';
+import React, { useRef } from 'react';
+import { useDrop } from 'react-dnd';
 
-const MatchEntry = () => {
-  const { register, handleSubmit, reset } = useForm();
-  const [players, setPlayers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [password, setPassword] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
-  const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
+interface DropBoxProps {
+  position: string;
+  team: any;
+  onDropPlayer: (player: any) => void;
+  onRemovePlayer: (position: string) => void;
+  onDropChampion: (champion: any, position: string, teamType: string) => void;
+  register: any;
+  teamType: 'A' | 'B';
+}
 
-  // Load players from API on component mount
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await axios.get('/api/get-players');
-        setPlayers(response.data);
-      } catch (error) {
-        console.error('Error fetching players:', error);
+const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemovePlayer, onDropChampion, register, teamType }) => {
+  const dropRef = useRef(null);
+  const [{ isOver }, drop] = useDrop({
+    accept: ['PLAYER', 'CHAMPION'],
+    drop: (item: any) => {
+      if (item.type === 'PLAYER') {
+        onDropPlayer(item);
+      } else if (item.type === 'CHAMPION') {
+        onDropChampion(item, position, teamType);
       }
-    };
-    fetchPlayers();
-  }, []);
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
 
-  // Mock authentication for simplicity
-  const authenticate = () => {
-    if (password === '1717') {
-      setIsAuthenticated(true);
-    } else {
-      alert('잘못된 비밀번호입니다!');
-    }
-  };
-
-  // Handler to submit match information
-  const onSubmit = async (data) => {
-    try {
-      // Save match information to Firebase
-      await addDoc(collection(db, '경기 정보'), {
-        matchTime: data.matchTime,
-        teamA: teamAPlayers,
-        teamB: teamBPlayers,
-        teamADetails: {
-          top: data['A.top'],
-          jungle: data['A.jungle'],
-          mid: data['A.mid'],
-          adc: data['A.adc'],
-          support: data['A.support'],
-        },
-        teamBDetails: {
-          top: data['B.top'],
-          jungle: data['B.jungle'],
-          mid: data['B.mid'],
-          adc: data['B.adc'],
-          support: data['B.support'],
-        },
-      });
-      // Reset form and player states
-      reset();
-      setTeamAPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
-      setTeamBPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
-      setPlayers((prev) => [...prev, ...Object.values(teamAPlayers).filter(Boolean), ...Object.values(teamBPlayers).filter(Boolean)]);
-      alert('경기 정보가 저장되었습니다.');
-    } catch (error) {
-      console.error('Error saving match information:', error);
-      alert('경기 정보를 저장하는 중 오류가 발생했습니다.');
-    }
-  };
-
-  // Handle player drop
-  const handleDropPlayer = (player, position, teamType) => {
-    if (teamType === 'A') {
-      setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
-    } else {
-      setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
-    }
-    setPlayers((prev) => prev.filter((p) => p.id !== player.id));
-  };
-
-  // Handle player removal from team
-  const handleRemovePlayer = (position, teamType) => {
-    if (teamType === 'A') {
-      setPlayers((prev) => [...prev, teamAPlayers[position]]);
-      setTeamAPlayers((prev) => ({ ...prev, [position]: null }));
-    } else {
-      setPlayers((prev) => [...prev, teamBPlayers[position]]);
-      setTeamBPlayers((prev) => ({ ...prev, [position]: null }));
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div>
-        <h2>관리자 로그인</h2>
-        <input
-          type="password"
-          placeholder="관리자 비밀번호 입력"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={authenticate}>로그인</button>
-      </div>
-    );
-  }
+  drop(dropRef);
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div>
-        <h1>경기 입력</h1>
-        <div style={{ display: 'flex', gap: '20px' }}>
-          <div style={{ flex: 1 }}>
-            {/* 선수 정보 리스트와 검색 기능 */}
-            <h2>선수 목록</h2>
-            <input
-              type="text"
-              placeholder="선수 검색"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <div
-              style={{
-                border: '1px solid black',
-                padding: '10px',
-                height: '400px',
-                overflowY: 'scroll',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(6, 1fr)',
-                gap: '10px',
-              }}
-            >
-              {players
-                .filter((player) =>
-                  player.name.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-                .map((player) => (
-                  <DraggablePlayer key={player.id} player={player} />
-                ))}
-            </div>
-
-            {/* 챔피언 목록 추가 */}
-            <ChampionEntry />
-          </div>
-          <div style={{ flex: 2 }}>
-            {/* 드래그 앤 드롭 팀 영역 */}
-            <div style={{ display: 'flex', gap: '20px' }}>
-              {['A팀', 'B팀'].map((team, teamIndex) => (
-                <div key={teamIndex} style={{ flex: 1 }}>
-                  <h2 style={{ marginBottom: '10px' }}>{team}</h2>
-                  {['top', 'jungle', 'mid', 'adc', 'support'].map((position) => (
-                    <DropBox
-                      key={position}
-                      position={position}
-                      team={teamIndex === 0 ? teamAPlayers : teamBPlayers}
-                      onDropPlayer={(player) =>
-                        handleDropPlayer(player, position, teamIndex === 0 ? 'A' : 'B')
-                      }
-                      onRemovePlayer={(position) =>
-                        handleRemovePlayer(position, teamIndex === 0 ? 'A' : 'B')
-                      }
-                      teamType={teamIndex === 0 ? 'A' : 'B'}
-                      register={register}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
+    <div
+      ref={dropRef}
+      style={{
+        border: isOver ? '2px solid green' : '1px solid #000',
+        padding: '10px',
+        minHeight: '100px',
+        marginBottom: '10px',
+        backgroundColor: '#f9f9f9',
+        transition: 'background-color 0.3s ease',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        gap: '20px',
+        position: 'relative',
+      }}
+    >
+      <strong
+        style={{
+          position: 'absolute',
+          top: '-20px',
+          left: '10px',
+          fontSize: '14px',
+          color: '#000',
+        }}
+      >
+        {position.toUpperCase()}
+      </strong>
+      {team[position] ? (
+        <div
+          style={{
+            padding: '10px',
+            backgroundColor: teamType === 'A' ? '#d0e8ff' : '#ffd0d0',
+            textAlign: 'center',
+            width: '100px',
+            position: 'relative',
+          }}
+        >
+          {team[position].name}
+          <br />
+          ({team[position].nickname})
+          <div
+            onClick={() => onRemovePlayer(position)}
+            style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              color: 'white',
+              padding: '2px 5px',
+              cursor: 'pointer',
+              fontSize: '12px',
+            }}
+          >
+            취소
           </div>
         </div>
-        {/* 경기 입력 폼 */}
-        <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', alignSelf: 'flex-start', marginLeft: '20px' }}>
-          {/* Match Time Selection */}
-          <div style={{ marginBottom: '10px' }}>
-            <label>내전 시간</label>
-            <select {...register('matchTime', { required: true })} style={{ marginLeft: '10px' }}>
-              <option value="">시간 선택</option>
-              <option value="오후 3시">오후 3시</option>
-              <option value="오후 5시">오후 5시</option>
-              <option value="오후 7시">오후 7시</option>
-              <option value="오후 9시 30분">오후 9시 30분</option>
-              <option value="2차">2차</option>
-              <option value="3차">3차</option>
-              <option value="4차">4차</option>
-            </select>
-          </div>
-          <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>
-        </form>
+      ) : (
+        <span
+          style={{
+            color: '#aaa',
+            fontSize: '14px',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          선수 입력
+        </span>
+      )}
+      {/* Kill, Death, Assist Input Fields */}
+      {team[position] && (
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <input
+            {...register(`${teamType}.${position}.kill`)}
+            placeholder="킬 수"
+            type="number"
+            min="0"
+            style={{ width: '60px' }}
+          />
+          <input
+            {...register(`${teamType}.${position}.death`)}
+            placeholder="데스 수"
+            type="number"
+            min="0"
+            style={{ width: '60px' }}
+          />
+          <input
+            {...register(`${teamType}.${position}.assist`)}
+            placeholder="어시스트 수"
+            type="number"
+            min="0"
+            style={{ width: '60px' }}
+          />
+        </div>
+      )}
+      {/* Champion Drop Box */}
+      <div
+        ref={dropRef}
+        style={{
+          border: '1px dashed #aaa',
+          padding: '10px',
+          width: '100px',
+          height: '80px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          marginTop: '10px',
+        }}
+      >
+        {team[position]?.champion ? (
+          <img src={team[position].champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
+        ) : (
+          <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
+        )}
       </div>
-    </DndProvider>
+    </div>
   );
 };
 
-export default MatchEntry;
+export default DropBox;
