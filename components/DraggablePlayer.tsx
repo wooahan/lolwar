@@ -1,36 +1,44 @@
-// File: components/DraggablePlayer.tsx
-
 import React from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { useDraggable } from '@dnd-kit/core';
 
-const DraggablePlayer = ({ player, index }) => {
+interface DraggablePlayerProps {
+  player: { id: string; name: string; nickname: string };
+}
+
+const DraggablePlayer: React.FC<DraggablePlayerProps> = ({ player }) => {
+  // useDraggable 훅 사용
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: player.id,
+  });
+
+  // 스타일 객체에 명시적으로 타입 지정
+  const style: React.CSSProperties = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    userSelect: 'none',
+    padding: '10px',
+    margin: '0 0 10px 0',
+    backgroundColor: isDragging ? '#d3d3d3' : '#f0f0f0',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+  };
+
   return (
-    <Draggable draggableId={player.id} index={index}>
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          style={{
-            ...provided.draggableProps.style,
-            userSelect: 'none',
-            padding: '10px',
-            margin: '0 0 10px 0',
-            backgroundColor: snapshot.isDragging ? '#d3d3d3' : '#f0f0f0',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          {player.name}
-          <br />
-          ({player.nickname})
-        </div>
-      )}
-    </Draggable>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+    >
+      {player.name}
+      <br />
+      ({player.nickname})
+    </div>
   );
 };
 
