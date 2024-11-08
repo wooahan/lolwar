@@ -19,6 +19,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   const [password, setPassword] = useState('');
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
+  const [availablePlayers, setAvailablePlayers] = useState(players);
 
   const handleAuthenticate = () => {
     authenticate(password);
@@ -49,6 +50,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
       reset();
       setTeamAPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
       setTeamBPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
+      setAvailablePlayers(players);
       alert('경기 정보가 저장되었습니다.');
     } catch (error) {
       console.error('Error saving match information:', error);
@@ -58,9 +60,17 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
 
   const handleRemovePlayer = (position: string, teamType: string) => {
     if (teamType === 'A') {
-      setTeamAPlayers((prev) => ({ ...prev, [position]: null }));
+      setTeamAPlayers((prev) => {
+        const removedPlayer = prev[position];
+        setAvailablePlayers((prevPlayers) => [...prevPlayers, removedPlayer]);
+        return { ...prev, [position]: null };
+      });
     } else {
-      setTeamBPlayers((prev) => ({ ...prev, [position]: null }));
+      setTeamBPlayers((prev) => {
+        const removedPlayer = prev[position];
+        setAvailablePlayers((prevPlayers) => [...prevPlayers, removedPlayer]);
+        return { ...prev, [position]: null };
+      });
     }
   };
 
@@ -70,7 +80,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
     if (over) {
       const teamType = over.data.current?.teamType;
       const position = over.data.current?.position;
-      const player = players.find((p) => p.id === active.id);
+      const player = availablePlayers.find((p) => p.id === active.id);
 
       if (player && teamType && position) {
         if (teamType === 'A') {
@@ -78,6 +88,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
         } else {
           setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
         }
+        setAvailablePlayers((prevPlayers) => prevPlayers.filter((p) => p.id !== active.id));
       }
     }
   };
@@ -121,7 +132,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
                 gap: '10px',
               }}
             >
-              {players
+              {availablePlayers
                 .filter((player) => player.name.toLowerCase().includes(searchTerm.toLowerCase()))
                 .map((player) => (
                   <DraggablePlayer key={player.id} player={player} />
@@ -163,10 +174,9 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
               <option value="PM 05:00">오후 5시</option>
               <option value="PM 07:00">오후 7시</option>
               <option value="PM 09:30">오후 9시 30분</option>
-              <option value="After PM 09:30">1차</option>
-              <option value="After First">2차</option>
-              <option value="After Second">3차</option>
-              <option value="After Third">4차</option>
+              <option value="2차">2차</option>
+              <option value="3차">3차</option>
+              <option value="4차">4차</option>
             </select>
           </div>
           <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>

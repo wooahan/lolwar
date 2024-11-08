@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DndContext, useDraggable } from '@dnd-kit/core';
 
 interface ChampionEntryProps {
   onDropChampion: (champion: any, position: string, teamType: string) => void;
@@ -11,12 +11,13 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
 
   // Load champions from local images folder
   useEffect(() => {
-    const fetchChampions = async () => {
+    const fetchChampions = () => {
       try {
-        // Fetch the list of champion images from the /public/images/champions/ directory
-        const response = await fetch('/images/champions');
-        const files = await response.json();
-        const championNames = files.map((fileName: string) => fileName.replace('.png', ''));
+        // Simulate fetching champion names from local directory
+        const championFiles = [
+          'Aatrox.png', 'Ahri.png', 'Akali.png', 'Alistar.png', 'Amumu.png', 'Anivia.png',
+        ];
+        const championNames = championFiles.map((fileName) => fileName.replace('.png', ''));
         setChampions(championNames);
       } catch (error) {
         console.error('Error fetching champions:', error);
@@ -25,12 +26,27 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
     fetchChampions();
   }, []);
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
-    const { source, destination } = result;
+  const DraggableChampion: React.FC<{ champion: string; index: number }> = ({ champion, index }) => {
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+      id: `champion-${index}`,
+    });
 
-    // Handle champion drop logic here if needed
-    console.log(`Champion moved from ${source.index} to ${destination.index}`);
+    const style: React.CSSProperties = {
+      transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+      textAlign: 'center',
+      opacity: isDragging ? 0.5 : 1,
+      cursor: 'pointer',
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+        <img
+          src={`/images/champions/${champion}.png`}
+          alt={champion}
+          style={{ width: '80px', height: '80px' }}
+        />
+      </div>
+    );
   };
 
   return (
@@ -42,54 +58,25 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
         value={championSearchTerm}
         onChange={(e) => setChampionSearchTerm(e.target.value)}
       />
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="champion-list">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              style={{
-                border: '1px solid black',
-                padding: '10px',
-                height: '400px',
-                overflowY: 'scroll',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(6, 1fr)',
-                gap: '10px',
-              }}
-            >
-              {champions
-                .filter((champion) =>
-                  champion.toLowerCase().includes(championSearchTerm.toLowerCase())
-                )
-                .map((champion, index) => (
-                  <Draggable key={champion} draggableId={champion} index={index}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={{
-                          ...provided.draggableProps.style,
-                          textAlign: 'center',
-                          opacity: snapshot.isDragging ? 0.5 : 1,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <img
-                          src={`/images/champions/${champion}.png`}
-                          alt={champion}
-                          style={{ width: '80px', height: '80px' }}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <div
+        style={{
+          border: '1px solid black',
+          padding: '10px',
+          height: '400px',
+          overflowY: 'scroll',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: '10px',
+        }}
+      >
+        {champions
+          .filter((champion) =>
+            champion.toLowerCase().includes(championSearchTerm.toLowerCase())
+          )
+          .map((champion, index) => (
+            <DraggableChampion key={champion} champion={champion} index={index} />
+          ))}
+      </div>
     </div>
   );
 };
