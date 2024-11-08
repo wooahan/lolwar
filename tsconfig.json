@@ -26,6 +26,15 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "firebaseConfig.d.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "firebaseConfig.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "stackbit.config.ts" // Stackbit 관련 파일 제외
+  ]
 }
