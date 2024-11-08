@@ -13,7 +13,7 @@ const MatchEntryPage = () => {
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const response = await axios.get('/api/get-players');
+        const response = await axios.get(`${window.location.origin}/api/get-players`);
         setPlayers(response.data);
       } catch (error) {
         console.error('Error fetching players:', error);
