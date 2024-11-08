@@ -49,8 +49,25 @@ const MatchEntry = () => {
         matchTime: data.matchTime,
         teamA: teamAPlayers,
         teamB: teamBPlayers,
+        teamADetails: {
+          top: data['teamA.top'],
+          jungle: data['teamA.jungle'],
+          mid: data['teamA.mid'],
+          adc: data['teamA.adc'],
+          support: data['teamA.support'],
+        },
+        teamBDetails: {
+          top: data['teamB.top'],
+          jungle: data['teamB.jungle'],
+          mid: data['teamB.mid'],
+          adc: data['teamB.adc'],
+          support: data['teamB.support'],
+        },
       });
+      // Reset form and player states
       reset();
+      setTeamAPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
+      setTeamBPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
       alert('경기 정보가 저장되었습니다.');
     } catch (error) {
       console.error('Error saving match information:', error);
