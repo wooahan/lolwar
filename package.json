@@ -15,6 +15,7 @@
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@netlify/plugin-nextjs": "^5.8.1",
+    "@stackbit/types": "^0.6.2",
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dnd": "^2.0.36",
     "@types/react-dnd-html5-backend": "^3.0.2",
@@ -23,6 +24,7 @@
     "axios": "^1.7.7",
     "cross-env": "^7.0.3",
     "dnd-core": "^16.0.1",
+    "express": "^4.21.1",
     "firebase": "^11.0.1",
     "firebase-admin": "^12.7.0",
     "fs": "^0.0.1-security",
@@ -37,7 +39,7 @@
     "react-hook-form": "^7.53.1"
   },
   "devDependencies": {
-    "@stackbit/types": "^0.6.0",
+    "@stackbit/types": "^0.6.2",
     "@types/next": "^8.0.7",
     "@types/node": "^20.17.6",
     "@types/react": "^18.3.12",
