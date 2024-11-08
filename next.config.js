@@ -16,7 +16,7 @@ const nextConfig = withTM({
   eslint: {
     ignoreDuringBuilds: true,
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.alias['@'] = path.resolve(__dirname);
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -29,6 +29,12 @@ const nextConfig = withTM({
       net: false,
       http2: false,
     };
+
+    // 서버와 클라이언트 각각에 대해 다른 설정을 추가할 수 있음
+    if (!isServer) {
+      config.resolve.alias['@components'] = path.resolve(__dirname, 'components');
+    }
+
     return config;
   },
 });
