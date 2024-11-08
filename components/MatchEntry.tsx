@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DragDropContext } from 'react-beautiful-dnd';
 import DraggablePlayer from './DraggablePlayer';
 import DropBox from './Dropbox';
 import ChampionEntry from './ChampionEntry';
@@ -104,7 +103,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DragDropContext onDragEnd={() => {}}>
       <div>
         <h1>경기 입력</h1>
         <div style={{ display: 'flex', gap: '20px' }}>
@@ -188,7 +187,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
           <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>
         </form>
       </div>
-    </DndProvider>
+    </DragDropContext>
   );
 };
 
