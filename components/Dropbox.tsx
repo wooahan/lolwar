@@ -12,6 +12,10 @@ interface DropBoxProps {
 const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, register, teamType }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: `${teamType}-${position}`,
+    data: {
+      teamType,
+      position,
+    },
   });
 
   return (
