@@ -11,14 +11,12 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
 
   // Load champions from local images folder
   useEffect(() => {
-    const fetchChampions = () => {
+    const fetchChampions = async () => {
       try {
-        // Use static import to fetch list of champion images from the /images/champions/ directory
-        const images = (require as any).context('../../images/champions', false, /\.(png|jpg|jpeg)$/);
-        const championNames = images.keys().map((fileName: string) => {
-          const name = fileName.replace('./', '').replace(/\.(png|jpg|jpeg)$/, '');
-          return name;
-        });
+        // Fetch the list of champion images from the /public/images/champions/ directory
+        const response = await fetch('/images/champions');
+        const files = await response.json();
+        const championNames = files.map((fileName: string) => fileName.replace('.png', ''));
         setChampions(championNames);
       } catch (error) {
         console.error('Error fetching champions:', error);
