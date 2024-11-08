@@ -58,14 +58,14 @@ const Home = () => {
         <section className="mb-8">
           <h2 className="text-xl font-bold mb-4">일반 메뉴</h2>
           <nav className="flex flex-col sm:flex-row justify-around">
-            <Link href="/ranking">
-              <a className="px-4 py-2 bg-green-500 text-white rounded mb-4 sm:mb-0">랭킹</a>
+            <Link href="/ranking" className="px-4 py-2 bg-green-500 text-white rounded mb-4 sm:mb-0">
+              랭킹
             </Link>
-            <Link href="/results">
-              <a className="px-4 py-2 bg-green-500 text-white rounded mb-4 sm:mb-0">내전 기록</a>
+            <Link href="/results" className="px-4 py-2 bg-green-500 text-white rounded mb-4 sm:mb-0">
+              내전 기록
             </Link>
-            <Link href="/board">
-              <a className="px-4 py-2 bg-green-500 text-white rounded">일일 게시판</a>
+            <Link href="/board" className="px-4 py-2 bg-green-500 text-white rounded">
+              일일 게시판
             </Link>
           </nav>
         </section>
@@ -74,11 +74,11 @@ const Home = () => {
         <section>
           <h2 className="text-xl font-bold mb-4">관리자 메뉴</h2>
           <nav className="flex flex-col sm:flex-row justify-around">
-            <Link href="/admin/player-management">
-              <a className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">선수 관리</a>
+            <Link href="/admin/player-management" className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">
+              선수 관리
             </Link>
-            <Link href="/admin/match-entry">
-              <a className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">경기 입력</a>
+            <Link href="/admin/match-entry" className="px-4 py-2 bg-blue-500 text-white rounded mb-4 sm:mb-0">
+              경기 입력
             </Link>
           </nav>
         </section>

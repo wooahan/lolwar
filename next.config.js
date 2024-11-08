@@ -9,6 +9,7 @@ const withTM = require('next-transpile-modules')([
 
 const nextConfig = withTM({
   reactStrictMode: true,
+  output: 'export', // 정적 HTML 파일 생성 설정 추가
   eslint: {
     ignoreDuringBuilds: true, // 빌드 중 eslint 경고 무시
   },
