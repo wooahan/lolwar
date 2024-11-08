@@ -1,11 +1,14 @@
-// File: components/ChampionEntry.tsx
-
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/firebaseClient';
+import { useDrag, DragSourceMonitor } from 'react-dnd';
 
-const ChampionEntry = () => {
-  const [champions, setChampions] = useState([]);
+interface ChampionEntryProps {
+  onDropChampion: (champion: any, position: string, teamType: string) => void;
+}
+
+const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
+  const [champions, setChampions] = useState<any[]>([]);
   const [championSearchTerm, setChampionSearchTerm] = useState('');
 
   // Load champions from Firebase
@@ -15,8 +18,7 @@ const ChampionEntry = () => {
         const championsCollection = collection(db, '챔피언 정보');
         const championsSnapshot = await getDocs(championsCollection);
         const championsData = championsSnapshot.docs.map((doc) => doc.data());
-        // Sort champions alphabetically by name
-        championsData.sort((a, b) => a.name.localeCompare(b.name));
+        championsData.sort((a, b) => a.name.localeCompare(b.name)); // 가나다 순으로 정렬
         setChampions(championsData);
       } catch (error) {
         console.error('Error fetching champions:', error);
@@ -49,11 +51,28 @@ const ChampionEntry = () => {
           .filter((champion) =>
             champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
           )
-          .map((champion, index) => (
-            <div key={index} style={{ textAlign: 'center', cursor: 'pointer' }}>
-              <img src={champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
-            </div>
-          ))}
+          .map((champion, index) => {
+            const [{ isDragging }, dragRef] = useDrag(() => ({
+              type: 'CHAMPION',
+              item: { type: 'CHAMPION', ...champion },
+              collect: (monitor: DragSourceMonitor) => ({
+                isDragging: monitor.isDragging(),
+              }),
+            }));
+            return (
+              <div
+                key={index}
+                ref={dragRef}
+                style={{
+                  textAlign: 'center',
+                  opacity: isDragging ? 0.5 : 1,
+                  cursor: 'pointer',
+                }}
+              >
+                <img src={champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
+              </div>
+            );
+          })}
       </div>
     </div>
   );
