@@ -27,6 +27,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   const onSubmit = async (data: any) => {
     try {
       await addDoc(collection(db, '경기 정보'), {
+        matchDate: data.matchDate,
         matchTime: data.matchTime,
         teamA: teamAPlayers,
         teamB: teamBPlayers,
@@ -151,16 +152,21 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
         </div>
         <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', alignSelf: 'flex-start', marginLeft: '20px' }}>
           <div style={{ marginBottom: '10px' }}>
+            <label>내전 날짜</label>
+            <input type="date" {...register('matchDate', { required: true })} style={{ marginLeft: '10px' }} />
+          </div>
+          <div style={{ marginBottom: '10px' }}>
             <label>내전 시간</label>
             <select {...register('matchTime', { required: true })} style={{ marginLeft: '10px' }}>
               <option value="">시간 선택</option>
-              <option value="오후 3시">오후 3시</option>
-              <option value="오후 5시">오후 5시</option>
-              <option value="오후 7시">오후 7시</option>
-              <option value="오후 9시 30분">오후 9시 30분</option>
-              <option value="2차">2차</option>
-              <option value="3차">3차</option>
-              <option value="4차">4차</option>
+              <option value="PM 03:00">오후 3시</option>
+              <option value="PM 05:00">오후 5시</option>
+              <option value="PM 07:00">오후 7시</option>
+              <option value="PM 09:30">오후 9시 30분</option>
+              <option value="After PM 09:30">1차</option>
+              <option value="After First">2차</option>
+              <option value="After Second">3차</option>
+              <option value="After Third">4차</option>
             </select>
           </div>
           <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>
