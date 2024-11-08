@@ -11,15 +11,14 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
 
   // Load champions from local images folder
   useEffect(() => {
-    const fetchChampions = async () => {
+    const fetchChampions = () => {
       try {
-        // Assuming images are in /images/champions/ and named by champion name
-        const championNames = [
-          'Aatrox', 'Ahri', 'Akali', 'Alistar', 'Amumu', 'Anivia', 'Annie',
-          'Ashe', 'AurelionSol', 'Azir', 'Bard', 'Blitzcrank', 'Brand',
-          'Braum', 'Caitlyn', 'Camille', 'Cassiopeia', 'Chogath', 'Corki'
-          // Add more names based on the champions available in the folder
-        ];
+        // Use static import to fetch list of champion images from the /images/champions/ directory
+        const images = (require as any).context('../../images/champions', false, /\.(png|jpg|jpeg)$/);
+        const championNames = images.keys().map((fileName: string) => {
+          const name = fileName.replace('./', '').replace(/\.(png|jpg|jpeg)$/, '');
+          return name;
+        });
         setChampions(championNames);
       } catch (error) {
         console.error('Error fetching champions:', error);
