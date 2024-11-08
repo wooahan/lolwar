@@ -26,23 +26,26 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemov
     <div
       ref={dropRef}
       style={{
-        border: isOver ? '2px solid green' : '2px dashed #ccc',
+        border: isOver ? '2px solid green' : '1px solid #000',
         padding: '10px',
         minHeight: '100px',
         marginBottom: '10px',
         backgroundColor: '#f9f9f9',
         transition: 'background-color 0.3s ease',
-        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        gap: '20px',
       }}
     >
-      <strong>{position.toUpperCase()}</strong>
-      {team[position] && (
+      {team[position] ? (
         <div
           style={{
-            padding: '5px',
+            padding: '10px',
             backgroundColor: teamType === 'A' ? '#d0e8ff' : '#ffd0d0',
-            marginTop: '5px',
             textAlign: 'center',
+            width: '100px',
+            position: 'relative',
           }}
         >
           {team[position].name}
@@ -64,14 +67,9 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemov
             취소
           </div>
         </div>
-      )}
-      {!team[position] && (
+      ) : (
         <span
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
             color: '#aaa',
             fontSize: '14px',
           }}
@@ -81,27 +79,27 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemov
       )}
       {/* Kill, Death, Assist Input Fields */}
       {team[position] && (
-        <div style={{ marginTop: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <input
             {...register(`${teamType}.${position}.kill`)}
             placeholder="킬 수"
             type="number"
             min="0"
-            style={{ width: '60px', marginRight: '5px' }}
+            style={{ width: '60px' }}
           />
           <input
             {...register(`${teamType}.${position}.death`)}
             placeholder="데스 수"
             type="number"
             min="0"
-            style={{ width: '60px', marginRight: '5px' }}
+            style={{ width: '60px' }}
           />
           <input
             {...register(`${teamType}.${position}.assist`)}
             placeholder="어시스트 수"
             type="number"
             min="0"
-            style={{ width: '60px', marginRight: '5px' }}
+            style={{ width: '60px' }}
           />
           <input
             {...register(`${teamType}.${position}.champion`)}
