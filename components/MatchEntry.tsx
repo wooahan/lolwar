@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useDrag } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 
 const DraggablePlayer = ({ player }) => {
   const dragRef = useRef(null);
@@ -41,12 +41,72 @@ const DraggablePlayer = ({ player }) => {
   );
 };
 
+const DropBox = ({ position, team, onDropPlayer }) => {
+  const dropRef = useRef(null);
+  const [{ isOver }, drop] = useDrop({
+    accept: 'PLAYER',
+    drop: (item) => onDropPlayer(item, position, team),
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
+
+  drop(dropRef);
+
+  return (
+    <div
+      ref={dropRef}
+      style={{
+        border: '2px dashed #ccc',
+        padding: '10px',
+        minHeight: '100px',
+        marginBottom: '10px',
+        backgroundColor: isOver ? '#e0e0e0' : '#f9f9f9',
+        transition: 'background-color 0.3s ease',
+        position: 'relative',
+      }}
+    >
+      <strong>{position.toUpperCase()}</strong>
+      {!team[position] && (
+        <span
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            color: '#aaa',
+            fontSize: '14px',
+          }}
+        >
+          선수 입력
+        </span>
+      )}
+      {team[position] && (
+        <div
+          style={{
+            padding: '5px',
+            backgroundColor: team === 'A' ? '#d0e8ff' : '#ffd0d0',
+            marginTop: '5px',
+            textAlign: 'center',
+          }}
+        >
+          {team[position].name}
+          <br />
+          ({team[position].nickname})
+        </div>
+      )}
+    </div>
+  );
+};
+
 const MatchEntry = () => {
   const { register, handleSubmit, reset } = useForm();
   const [players, setPlayers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
+  const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
 
   // Load players from API on component mount
   useEffect(() => {
@@ -78,6 +138,15 @@ const MatchEntry = () => {
     localStorage.setItem('matches', JSON.stringify(updatedMatches));
     reset();
     alert('경기 정보가 저장되었습니다.');
+  };
+
+  // Handle player drop
+  const handleDropPlayer = (player, position, team) => {
+    if (team === 'A') {
+      setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
+    } else {
+      setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
+    }
   };
 
   if (!isAuthenticated) {
@@ -130,6 +199,24 @@ const MatchEntry = () => {
             </div>
           </div>
           <div style={{ flex: 2 }}>
+            {/* 드래그 앤 드롭 팀 영역 */}
+            <div style={{ display: 'flex', gap: '20px' }}>
+              {['A팀', 'B팀'].map((team, teamIndex) => (
+                <div key={teamIndex} style={{ flex: 1 }}>
+                  <h2>{team}</h2>
+                  {['top', 'jungle', 'mid', 'adc', 'support'].map((position) => (
+                    <DropBox
+                      key={position}
+                      position={position}
+                      team={teamIndex === 0 ? teamAPlayers : teamBPlayers}
+                      onDropPlayer={(player, position) =>
+                        handleDropPlayer(player, position, teamIndex === 0 ? 'A' : 'B')
+                      }
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
             {/* 경기 입력 폼 */}
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* Match Time Selection */}
