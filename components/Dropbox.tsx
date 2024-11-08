@@ -36,8 +36,20 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemov
         alignItems: 'center',
         justifyContent: 'flex-start',
         gap: '20px',
+        position: 'relative',
       }}
     >
+      <strong
+        style={{
+          position: 'absolute',
+          top: '-20px',
+          left: '10px',
+          fontSize: '14px',
+          color: '#000',
+        }}
+      >
+        {position.toUpperCase()}
+      </strong>
       {team[position] ? (
         <div
           style={{
@@ -72,6 +84,10 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemov
           style={{
             color: '#aaa',
             fontSize: '14px',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         >
           선수 입력

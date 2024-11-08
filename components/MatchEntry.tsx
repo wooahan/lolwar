@@ -1,5 +1,3 @@
-// File: pages/admin/MatchEntry.tsx
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -50,18 +48,18 @@ const MatchEntry = () => {
         teamA: teamAPlayers,
         teamB: teamBPlayers,
         teamADetails: {
-          top: data['teamA.top'],
-          jungle: data['teamA.jungle'],
-          mid: data['teamA.mid'],
-          adc: data['teamA.adc'],
-          support: data['teamA.support'],
+          top: data['A.top'],
+          jungle: data['A.jungle'],
+          mid: data['A.mid'],
+          adc: data['A.adc'],
+          support: data['A.support'],
         },
         teamBDetails: {
-          top: data['teamB.top'],
-          jungle: data['teamB.jungle'],
-          mid: data['teamB.mid'],
-          adc: data['teamB.adc'],
-          support: data['teamB.support'],
+          top: data['B.top'],
+          jungle: data['B.jungle'],
+          mid: data['B.mid'],
+          adc: data['B.adc'],
+          support: data['B.support'],
         },
       });
       // Reset form and player states
@@ -173,7 +171,7 @@ const MatchEntry = () => {
           </div>
         </div>
         {/* 경기 입력 폼 */}
-        <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', marginLeft: '250px' }}>
+        <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', alignSelf: 'flex-start' }}>
           {/* Match Time Selection */}
           <div style={{ marginBottom: '10px' }}>
             <label>내전 시간</label>
