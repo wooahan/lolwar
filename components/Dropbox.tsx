@@ -33,6 +33,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
         justifyContent: 'flex-start',
         gap: '20px',
         position: 'relative',
+        flexWrap: 'wrap',
       }}
     >
       <strong
@@ -91,7 +92,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
       )}
       {/* Kill, Death, Assist Input Fields */}
       {team[position] && (
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <input
             {...register(`${teamType}.${position}.kill`)}
             placeholder="킬 수"
@@ -126,6 +127,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
+          flexWrap: 'wrap',
         }}
       >
         {team[position]?.champion ? (

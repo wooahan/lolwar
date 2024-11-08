@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { db } from '@/firebaseClient';
+import React, { useState, useEffect } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 interface ChampionEntryProps {
@@ -8,18 +6,21 @@ interface ChampionEntryProps {
 }
 
 const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
-  const [champions, setChampions] = useState<any[]>([]);
+  const [champions, setChampions] = useState<string[]>([]);
   const [championSearchTerm, setChampionSearchTerm] = useState('');
 
-  // Load champions from Firebase
+  // Load champions from local images folder
   useEffect(() => {
     const fetchChampions = async () => {
       try {
-        const championsCollection = collection(db, '챔피언 정보');
-        const championsSnapshot = await getDocs(championsCollection);
-        const championsData = championsSnapshot.docs.map((doc) => doc.data());
-        championsData.sort((a, b) => a.name.localeCompare(b.name)); // 가나다 순으로 정렬
-        setChampions(championsData);
+        // Assuming images are in /images/champions/ and named by champion name
+        const championNames = [
+          'Aatrox', 'Ahri', 'Akali', 'Alistar', 'Amumu', 'Anivia', 'Annie',
+          'Ashe', 'AurelionSol', 'Azir', 'Bard', 'Blitzcrank', 'Brand',
+          'Braum', 'Caitlyn', 'Camille', 'Cassiopeia', 'Chogath', 'Corki'
+          // Add more names based on the champions available in the folder
+        ];
+        setChampions(championNames);
       } catch (error) {
         console.error('Error fetching champions:', error);
       }
@@ -62,10 +63,10 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
             >
               {champions
                 .filter((champion) =>
-                  champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
+                  champion.toLowerCase().includes(championSearchTerm.toLowerCase())
                 )
                 .map((champion, index) => (
-                  <Draggable key={champion.name} draggableId={champion.name} index={index}>
+                  <Draggable key={champion} draggableId={champion} index={index}>
                     {(provided, snapshot) => (
                       <div
                         ref={provided.innerRef}
@@ -78,7 +79,11 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
                           cursor: 'pointer',
                         }}
                       >
-                        <img src={champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
+                        <img
+                          src={`/images/champions/${champion}.png`}
+                          alt={champion}
+                          style={{ width: '80px', height: '80px' }}
+                        />
                       </div>
                     )}
                   </Draggable>
