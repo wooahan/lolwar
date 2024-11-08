@@ -137,9 +137,7 @@ const PlayerManagement = () => {
   return (
     <div>
       <h1>선수 관리</h1>
-      <Link href="/">
-        <a>홈으로 돌아가기</a>
-      </Link>
+      <Link href="/">홈으로 돌아가기</Link>
       <form onSubmit={handleSubmit(onSubmit)}>
         <input {...register('id')} type="hidden" />
         <div>
