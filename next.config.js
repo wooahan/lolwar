@@ -10,16 +10,26 @@ const withTM = require('next-transpile-modules')([
 const nextConfig = withTM({
   reactStrictMode: true,
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // 빌드 중 eslint 경고 무시
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
+    // 기본적인 alias 설정 추가
     config.resolve.alias['@'] = path.resolve(__dirname);
+
+    // Webpack 설정 변경 - fallback 설정에서 사용되지 않는 Node API 모듈 제거
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       net: false,
       http2: false,
     };
+
+    // 클라이언트와 서버에서 다르게 동작할 수 있는 문제를 방지하기 위해 추가 설정
+    if (!isServer) {
+      config.resolve.alias['react/jsx-runtime'] = require.resolve('react/jsx-runtime');
+      config.resolve.alias['react/jsx-dev-runtime'] = require.resolve('react/jsx-dev-runtime');
+    }
+
     return config;
   },
 });
