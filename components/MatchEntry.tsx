@@ -6,7 +6,7 @@ import axios from 'axios';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import DraggablePlayer from './DraggablePlayer';
-import DropBox from './DropBox';
+import DropBox from './Dropbox';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { db } from '@/firebaseClient';
 
