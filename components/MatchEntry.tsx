@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axios from 'axios';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import SortableItem from './SortableItem';
 
 const MatchEntry = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -11,6 +13,8 @@ const MatchEntry = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Load players from API on component mount
   useEffect(() => {
@@ -25,6 +29,15 @@ const MatchEntry = () => {
     fetchPlayers();
   }, []);
 
+  // Mock authentication for simplicity
+  const authenticate = () => {
+    if (password === '1717') {
+      setIsAuthenticated(true);
+    } else {
+      alert('잘못된 비밀번호입니다!');
+    }
+  };
+
   // Handler to submit match information
   const onSubmit = (data) => {
     // Save match information logic here
@@ -36,21 +49,39 @@ const MatchEntry = () => {
   };
 
   // Handle drag end
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
 
-    const { source, destination } = result;
+    const activeId = active.id;
+    const overId = over.id;
 
-    // Dragging from players list to Team A or Team B
-    if (source.droppableId === 'players') {
-      const player = players[source.index];
-      if (destination.droppableId.startsWith('teamA')) {
-        setTeamAPlayers((prev) => ({ ...prev, [destination.droppableId.split('-')[1]]: player }));
-      } else if (destination.droppableId.startsWith('teamB')) {
-        setTeamBPlayers((prev) => ({ ...prev, [destination.droppableId.split('-')[1]]: player }));
+    if (overId.startsWith('teamA') || overId.startsWith('teamB')) {
+      const [team, position] = overId.split('-');
+      const player = players.find((p) => p.id === activeId);
+
+      if (team === 'teamA') {
+        setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
+      } else if (team === 'teamB') {
+        setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
       }
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div>
+        <h2>관리자 로그인</h2>
+        <input
+          type="password"
+          placeholder="관리자 비밀번호 입력"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={authenticate}>로그인</button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -65,190 +96,159 @@ const MatchEntry = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="players">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  style={{
-                    border: '1px solid black',
-                    padding: '10px',
-                    height: '400px',
-                    overflowY: 'scroll',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(6, 1fr)',
-                    gap: '10px',
-                  }}
-                >
-                  {players
-                    .filter((player) =>
-                      player.name.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                    .map((player, index) => (
-                      <Draggable key={player.id} draggableId={player.id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{
-                              userSelect: 'none',
-                              padding: '10px',
-                              backgroundColor: '#f0f0f0',
-                              textAlign: 'center',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              ...provided.draggableProps.style,
-                            }}
-                          >
-                            {player.name}
-                            <br />
-                            ({player.nickname})
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={players} strategy={verticalListSortingStrategy}>
+              <div
+                style={{
+                  border: '1px solid black',
+                  padding: '10px',
+                  height: '400px',
+                  overflowY: 'scroll',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(6, 1fr)',
+                  gap: '10px',
+                }}
+              >
+                {players
+                  .filter((player) =>
+                    player.name.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((player) => (
+                    <SortableItem key={player.id} id={player.id}>
+                      <div
+                        style={{
+                          userSelect: 'none',
+                          padding: '10px',
+                          backgroundColor: '#f0f0f0',
+                          textAlign: 'center',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {player.name}
+                        <br />
+                        ({player.nickname})
+                      </div>
+                    </SortableItem>
+                  ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
         <div style={{ flex: 2 }}>
           {/* 드래그 앤 드롭 팀 영역 */}
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <div style={{ display: 'flex', gap: '20px' }}>
               {['A팀', 'B팀'].map((team, teamIndex) => (
                 <div key={teamIndex} style={{ flex: 1 }}>
                   <h2>{team}</h2>
                   {['top', 'jungle', 'mid', 'adc', 'support'].map((position) => (
-                    <Droppable key={position} droppableId={`${teamIndex === 0 ? 'teamA' : 'teamB'}-${position}`}>
-                      {(provided, snapshot) => (
+                    <div
+                      key={position}
+                      id={`${teamIndex === 0 ? 'teamA' : 'teamB'}-${position}`}
+                      style={{
+                        border: '2px dashed #ccc',
+                        padding: '10px',
+                        minHeight: '100px',
+                        marginBottom: '10px',
+                        backgroundColor: '#f9f9f9',
+                        transition: 'background-color 0.3s ease',
+                        position: 'relative',
+                      }}
+                    >
+                      <strong>{position.toUpperCase()}</strong>
+                      {teamIndex === 0 && teamAPlayers[position] && (
                         <div
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
                           style={{
-                            border: '2px dashed #ccc',
-                            padding: '10px',
-                            minHeight: '100px',
-                            marginBottom: '10px',
-                            backgroundColor: snapshot.isDraggingOver ? '#e0e0e0' : '#f9f9f9',
-                            transition: 'background-color 0.3s ease',
-                            position: 'relative',
+                            padding: '5px',
+                            backgroundColor: '#d0e8ff',
+                            marginTop: '5px',
+                            textAlign: 'center',
                           }}
                         >
-                          <strong>{position.toUpperCase()}</strong>
-                          {!teamAPlayers[position] && !teamBPlayers[position] && (
-                            <span
-                              style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                color: '#aaa',
-                                fontSize: '14px',
-                              }}
-                            >
-                              선수 입력
-                            </span>
-                          )}
-                          {teamIndex === 0
-                            ? teamAPlayers[position] && (
-                                <div
-                                  style={{
-                                    padding: '5px',
-                                    backgroundColor: '#d0e8ff',
-                                    marginTop: '5px',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {teamAPlayers[position].name}
-                                  <br />
-                                  ({teamAPlayers[position].nickname})
-                                  <div>
-                                    <input
-                                      {...register(`teamA.${position}.player`, { value: teamAPlayers[position].name })}
-                                      type="hidden"
-                                    />
-                                    <input
-                                      {...register(`teamA.${position}.kill`)}
-                                      placeholder="킬"
-                                      type="number"
-                                      min="0"
-                                    />
-                                    <input
-                                      {...register(`teamA.${position}.death`)}
-                                      placeholder="데스"
-                                      type="number"
-                                      min="0"
-                                    />
-                                    <input
-                                      {...register(`teamA.${position}.assist`)}
-                                      placeholder="어시스트"
-                                      type="number"
-                                      min="0"
-                                    />
-                                    <input
-                                      {...register(`teamA.${position}.champion`)}
-                                      placeholder="사용한 챔피언"
-                                    />
-                                  </div>
-                                </div>
-                              )
-                            : teamBPlayers[position] && (
-                                <div
-                                  style={{
-                                    padding: '5px',
-                                    backgroundColor: '#ffd0d0',
-                                    marginTop: '5px',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  {teamBPlayers[position].name}
-                                  <br />
-                                  ({teamBPlayers[position].nickname})
-                                  <div>
-                                    <input
-                                      {...register(`teamB.${position}.player`, { value: teamBPlayers[position].name })}
-                                      type="hidden"
-                                    />
-                                    <input
-                                      {...register(`teamB.${position}.kill`)}
-                                      placeholder="킬"
-                                      type="number"
-                                      min="0"
-                                    />
-                                    <input
-                                      {...register(`teamB.${position}.death`)}
-                                      placeholder="데스"
-                                      type="number"
-                                      min="0"
-                                    />
-                                    <input
-                                      {...register(`teamB.${position}.assist`)}
-                                      placeholder="어시스트"
-                                      type="number"
-                                      min="0"
-                                    />
-                                    <input
-                                      {...register(`teamB.${position}.champion`)}
-                                      placeholder="사용한 챔피언"
-                                    />
-                                  </div>
-                                </div>
-                              )}
-                          {provided.placeholder}
+                          {teamAPlayers[position].name}
+                          <br />
+                          ({teamAPlayers[position].nickname})
+                          <div>
+                            <input
+                              {...register(`teamA.${position}.player`, { value: teamAPlayers[position].name })}
+                              type="hidden"
+                            />
+                            <input
+                              {...register(`teamA.${position}.kill`)}
+                              placeholder="킬"
+                              type="number"
+                              min="0"
+                            />
+                            <input
+                              {...register(`teamA.${position}.death`)}
+                              placeholder="데스"
+                              type="number"
+                              min="0"
+                            />
+                            <input
+                              {...register(`teamA.${position}.assist`)}
+                              placeholder="어시스트"
+                              type="number"
+                              min="0"
+                            />
+                            <input
+                              {...register(`teamA.${position}.champion`)}
+                              placeholder="사용한 챔피언"
+                            />
+                          </div>
                         </div>
                       )}
-                    </Droppable>
+                      {teamIndex === 1 && teamBPlayers[position] && (
+                        <div
+                          style={{
+                            padding: '5px',
+                            backgroundColor: '#ffd0d0',
+                            marginTop: '5px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {teamBPlayers[position].name}
+                          <br />
+                          ({teamBPlayers[position].nickname})
+                          <div>
+                            <input
+                              {...register(`teamB.${position}.player`, { value: teamBPlayers[position].name })}
+                              type="hidden"
+                            />
+                            <input
+                              {...register(`teamB.${position}.kill`)}
+                              placeholder="킬"
+                              type="number"
+                              min="0"
+                            />
+                            <input
+                              {...register(`teamB.${position}.death`)}
+                              placeholder="데스"
+                              type="number"
+                              min="0"
+                            />
+                            <input
+                              {...register(`teamB.${position}.assist`)}
+                              placeholder="어시스트"
+                              type="number"
+                              min="0"
+                            />
+                            <input
+                              {...register(`teamB.${position}.champion`)}
+                              placeholder="사용한 챔피언"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               ))}
             </div>
-          </DragDropContext>
+          </DndContext>
           {/* 경기 입력 폼 */}
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Match Time Selection */}
