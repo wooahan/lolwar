@@ -41,11 +41,11 @@ const DraggablePlayer = ({ player }) => {
   );
 };
 
-const DropBox = ({ position, team, onDropPlayer }) => {
+const DropBox = ({ position, team, onDropPlayer, onRemovePlayer }) => {
   const dropRef = useRef(null);
   const [{ isOver }, drop] = useDrop({
     accept: 'PLAYER',
-    drop: (item) => onDropPlayer(item, position, team),
+    drop: (item) => onDropPlayer(item, position),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
@@ -85,14 +85,30 @@ const DropBox = ({ position, team, onDropPlayer }) => {
         <div
           style={{
             padding: '5px',
-            backgroundColor: team === 'A' ? '#d0e8ff' : '#ffd0d0',
+            backgroundColor: '#d0e8ff',
             marginTop: '5px',
             textAlign: 'center',
+            position: 'relative',
           }}
         >
           {team[position].name}
           <br />
           ({team[position].nickname})
+          <div
+            onClick={() => onRemovePlayer(position, team)}
+            style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              color: 'white',
+              padding: '2px 5px',
+              cursor: 'pointer',
+              fontSize: '12px',
+            }}
+          >
+            취소
+          </div>
         </div>
       )}
     </div>
@@ -141,11 +157,23 @@ const MatchEntry = () => {
   };
 
   // Handle player drop
-  const handleDropPlayer = (player, position, team) => {
-    if (team === 'A') {
+  const handleDropPlayer = (player, position, teamType) => {
+    if (teamType === 'A') {
       setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
     } else {
       setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
+    }
+    setPlayers((prev) => prev.filter((p) => p.id !== player.id));
+  };
+
+  // Handle player removal from team
+  const handleRemovePlayer = (position, team) => {
+    if (team === teamAPlayers) {
+      setPlayers((prev) => [...prev, teamAPlayers[position]]);
+      setTeamAPlayers((prev) => ({ ...prev, [position]: null }));
+    } else {
+      setPlayers((prev) => [...prev, teamBPlayers[position]]);
+      setTeamBPlayers((prev) => ({ ...prev, [position]: null }));
     }
   };
 
@@ -209,9 +237,10 @@ const MatchEntry = () => {
                       key={position}
                       position={position}
                       team={teamIndex === 0 ? teamAPlayers : teamBPlayers}
-                      onDropPlayer={(player, position) =>
+                      onDropPlayer={(player) =>
                         handleDropPlayer(player, position, teamIndex === 0 ? 'A' : 'B')
                       }
+                      onRemovePlayer={handleRemovePlayer}
                     />
                   ))}
                 </div>
@@ -219,7 +248,6 @@ const MatchEntry = () => {
             </div>
             {/* 경기 입력 폼 */}
             <form onSubmit={handleSubmit(onSubmit)}>
-              {/* Match Time Selection */}
               <div>
                 <label>내전 시간</label>
                 <select {...register('matchTime', { required: true })}>

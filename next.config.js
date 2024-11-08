@@ -1,7 +1,14 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
+const withTM = require('next-transpile-modules')([
+  'react-dnd',
+  'dnd-core',
+  '@react-dnd/invariant',
+  '@react-dnd/asap',
+  '@react-dnd/shallowequal',
+]);
 
-const nextConfig = {
+const nextConfig = withTM({
   reactStrictMode: true,
   trailingSlash: false,
   eslint: {
@@ -9,6 +16,11 @@ const nextConfig = {
   },
   webpack: (config) => {
     config.resolve.alias['@'] = path.resolve(__dirname);
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'react/jsx-runtime.js': require.resolve('react/jsx-runtime'),
+      'react/jsx-dev-runtime.js': require.resolve('react/jsx-dev-runtime'),
+    };
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
@@ -17,6 +29,6 @@ const nextConfig = {
     };
     return config;
   },
-};
+});
 
 module.exports = nextConfig;
