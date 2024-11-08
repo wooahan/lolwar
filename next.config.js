@@ -1,13 +1,16 @@
+// next.config.js
+
+const path = require('path'); // 추가
+
 const withTM = require('next-transpile-modules')([
   'react-dnd',
-  'react-dnd-html5-backend',
   'dnd-core',
   '@react-dnd/invariant',
   '@react-dnd/asap',
   '@react-dnd/shallowequal',
 ]);
 
-module.exports = withTM({
+const nextConfig = withTM({
   reactStrictMode: true,
   trailingSlash: false,
   eslint: {
@@ -29,3 +32,5 @@ module.exports = withTM({
     return config;
   },
 });
+
+module.exports = nextConfig;
