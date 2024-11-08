@@ -68,6 +68,7 @@ const MatchEntry = () => {
       reset();
       setTeamAPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
       setTeamBPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
+      setPlayers((prev) => [...prev, ...Object.values(teamAPlayers).filter(Boolean), ...Object.values(teamBPlayers).filter(Boolean)]);
       alert('경기 정보가 저장되었습니다.');
     } catch (error) {
       console.error('Error saving match information:', error);
@@ -172,11 +173,11 @@ const MatchEntry = () => {
           </div>
         </div>
         {/* 경기 입력 폼 */}
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', marginLeft: '10px' }}>
           {/* Match Time Selection */}
-          <div>
+          <div style={{ marginBottom: '10px' }}>
             <label>내전 시간</label>
-            <select {...register('matchTime', { required: true })}>
+            <select {...register('matchTime', { required: true })} style={{ marginLeft: '10px' }}>
               <option value="">시간 선택</option>
               <option value="오후 3시">오후 3시</option>
               <option value="오후 5시">오후 5시</option>
@@ -187,7 +188,7 @@ const MatchEntry = () => {
               <option value="4차">4차</option>
             </select>
           </div>
-          <button type="submit">경기 저장</button>
+          <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>
         </form>
       </div>
     </DndProvider>
