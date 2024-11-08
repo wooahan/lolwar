@@ -175,7 +175,7 @@ const MatchEntry = () => {
         {/* 경기 입력 폼 */}
         <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', marginLeft: '10px' }}>
           {/* Match Time Selection */}
-          <div style={{ marginBottom: '10px' }}>
+          <div style={{ marginBottom: '10px', marginLeft: '10px' }}>
             <label>내전 시간</label>
             <select {...register('matchTime', { required: true })} style={{ marginLeft: '10px' }}>
               <option value="">시간 선택</option>
@@ -188,7 +188,7 @@ const MatchEntry = () => {
               <option value="4차">4차</option>
             </select>
           </div>
-          <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>
+          <button type="submit" style={{ marginTop: '10px', marginLeft: '10px' }}>경기 저장</button>
         </form>
       </div>
     </DndProvider>
