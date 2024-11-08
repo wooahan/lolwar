@@ -62,13 +62,17 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
     if (teamType === 'A') {
       setTeamAPlayers((prev) => {
         const removedPlayer = prev[position];
-        setAvailablePlayers((prevPlayers) => [...prevPlayers, removedPlayer]);
+        if (removedPlayer) {
+          setAvailablePlayers((prevPlayers) => [...prevPlayers, removedPlayer]);
+        }
         return { ...prev, [position]: null };
       });
     } else {
       setTeamBPlayers((prev) => {
         const removedPlayer = prev[position];
-        setAvailablePlayers((prevPlayers) => [...prevPlayers, removedPlayer]);
+        if (removedPlayer) {
+          setAvailablePlayers((prevPlayers) => [...prevPlayers, removedPlayer]);
+        }
         return { ...prev, [position]: null };
       });
     }
@@ -78,8 +82,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
     const { active, over } = event;
 
     if (over) {
-      const teamType = over.data.current?.teamType;
-      const position = over.data.current?.position;
+      const { teamType, position } = over.data.current || {};
       const player = availablePlayers.find((p) => p.id === active.id);
 
       if (player && teamType && position) {

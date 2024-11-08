@@ -11,14 +11,16 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
 
   // Load champions from local images folder
   useEffect(() => {
-    const fetchChampions = () => {
+    const fetchChampions = async () => {
       try {
-        // Simulate fetching champion names from local directory
-        const championFiles = [
-          'Aatrox.png', 'Ahri.png', 'Akali.png', 'Alistar.png', 'Amumu.png', 'Anivia.png',
-        ];
-        const championNames = championFiles.map((fileName) => fileName.replace('.png', ''));
-        setChampions(championNames);
+        const response = await fetch('/images/champions');
+        if (response.ok) {
+          const files = await response.json();
+          const championNames = files.map((fileName: string) => fileName.replace('.png', ''));
+          setChampions(championNames);
+        } else {
+          console.error('Error fetching champions:', response.statusText);
+        }
       } catch (error) {
         console.error('Error fetching champions:', error);
       }
