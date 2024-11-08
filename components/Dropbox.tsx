@@ -1,11 +1,20 @@
 import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
-const DropBox = ({ position, team, onDropPlayer, onRemovePlayer, teamType }) => {
+interface DropBoxProps {
+  position: string;
+  team: any;
+  onDropPlayer: (player: any) => void;
+  onRemovePlayer: (position: string) => void;
+  register: any;
+  teamType: 'A' | 'B';
+}
+
+const DropBox: React.FC<DropBoxProps> = ({ position, team, onDropPlayer, onRemovePlayer, register, teamType }) => {
   const dropRef = useRef(null);
   const [{ isOver }, drop] = useDrop({
     accept: 'PLAYER',
-    drop: (item) => onDropPlayer(item, position, teamType),
+    drop: (item: any) => onDropPlayer(item),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
@@ -17,30 +26,16 @@ const DropBox = ({ position, team, onDropPlayer, onRemovePlayer, teamType }) => 
     <div
       ref={dropRef}
       style={{
-        border: '2px dashed #ccc',
+        border: isOver ? '2px solid green' : '2px dashed #ccc',
         padding: '10px',
         minHeight: '100px',
         marginBottom: '10px',
-        backgroundColor: isOver ? '#e0e0e0' : '#f9f9f9',
+        backgroundColor: '#f9f9f9',
         transition: 'background-color 0.3s ease',
         position: 'relative',
       }}
     >
       <strong>{position.toUpperCase()}</strong>
-      {!team[position] && (
-        <span
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            color: '#aaa',
-            fontSize: '14px',
-          }}
-        >
-          선수 입력
-        </span>
-      )}
       {team[position] && (
         <div
           style={{
@@ -48,7 +43,6 @@ const DropBox = ({ position, team, onDropPlayer, onRemovePlayer, teamType }) => 
             backgroundColor: teamType === 'A' ? '#d0e8ff' : '#ffd0d0',
             marginTop: '5px',
             textAlign: 'center',
-            position: 'relative',
           }}
         >
           {team[position].name}
@@ -69,6 +63,52 @@ const DropBox = ({ position, team, onDropPlayer, onRemovePlayer, teamType }) => 
           >
             취소
           </div>
+        </div>
+      )}
+      {!team[position] && (
+        <span
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            color: '#aaa',
+            fontSize: '14px',
+          }}
+        >
+          선수 입력
+        </span>
+      )}
+      {/* Kill, Death, Assist Input Fields */}
+      {team[position] && (
+        <div style={{ marginTop: '10px' }}>
+          <input
+            {...register(`${teamType}.${position}.kill`)}
+            placeholder="킬 수"
+            type="number"
+            min="0"
+            style={{ width: '60px', marginRight: '5px' }}
+          />
+          <input
+            {...register(`${teamType}.${position}.death`)}
+            placeholder="데스 수"
+            type="number"
+            min="0"
+            style={{ width: '60px', marginRight: '5px' }}
+          />
+          <input
+            {...register(`${teamType}.${position}.assist`)}
+            placeholder="어시스트 수"
+            type="number"
+            min="0"
+            style={{ width: '60px', marginRight: '5px' }}
+          />
+          <input
+            {...register(`${teamType}.${position}.champion`)}
+            placeholder="사용한 챔피언"
+            type="text"
+            style={{ width: '100px' }}
+          />
         </div>
       )}
     </div>

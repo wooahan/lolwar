@@ -7,7 +7,8 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import DraggablePlayer from './DraggablePlayer';
 import DropBox from './Dropbox';
-
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { db } from '@/firebaseClient';
 
 const MatchEntry = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -41,13 +42,20 @@ const MatchEntry = () => {
   };
 
   // Handler to submit match information
-  const onSubmit = (data) => {
-    // Save match information logic here
-    const storedMatches = JSON.parse(localStorage.getItem('matches') || '[]');
-    const updatedMatches = [...storedMatches, data];
-    localStorage.setItem('matches', JSON.stringify(updatedMatches));
-    reset();
-    alert('경기 정보가 저장되었습니다.');
+  const onSubmit = async (data) => {
+    try {
+      // Save match information to Firebase
+      await addDoc(collection(db, '경기 정보'), {
+        matchTime: data.matchTime,
+        teamA: teamAPlayers,
+        teamB: teamBPlayers,
+      });
+      reset();
+      alert('경기 정보가 저장되었습니다.');
+    } catch (error) {
+      console.error('Error saving match information:', error);
+      alert('경기 정보를 저장하는 중 오류가 발생했습니다.');
+    }
   };
 
   // Handle player drop
@@ -138,6 +146,7 @@ const MatchEntry = () => {
                         handleRemovePlayer(position, teamIndex === 0 ? 'A' : 'B')
                       }
                       teamType={teamIndex === 0 ? 'A' : 'B'}
+                      register={register}
                     />
                   ))}
                 </div>
