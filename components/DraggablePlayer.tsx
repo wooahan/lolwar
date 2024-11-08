@@ -1,39 +1,36 @@
 // File: components/DraggablePlayer.tsx
 
-import React, { useRef } from 'react';
-import { useDrag } from 'react-dnd';
+import React from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 
-const DraggablePlayer = ({ player }) => {
-  const dragRef = useRef(null);
-  const [{ isDragging }, drag] = useDrag({
-    type: 'PLAYER',
-    item: { id: player.id, name: player.name, nickname: player.nickname },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  drag(dragRef);
-
+const DraggablePlayer = ({ player, index }) => {
   return (
-    <div
-      ref={dragRef}
-      style={{
-        userSelect: 'none',
-        padding: '10px',
-        backgroundColor: isDragging ? '#d3d3d3' : '#f0f0f0',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-      }}
-    >
-      {player.name}
-      <br />
-      ({player.nickname})
-    </div>
+    <Draggable draggableId={player.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            ...provided.draggableProps.style,
+            userSelect: 'none',
+            padding: '10px',
+            margin: '0 0 10px 0',
+            backgroundColor: snapshot.isDragging ? '#d3d3d3' : '#f0f0f0',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          {player.name}
+          <br />
+          ({player.nickname})
+        </div>
+      )}
+    </Draggable>
   );
 };
 

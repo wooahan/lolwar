@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import DraggablePlayer from './DraggablePlayer';
 import DropBox from './Dropbox';
 import ChampionEntry from './ChampionEntry';
@@ -60,15 +60,6 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
     }
   };
 
-  // Handle player drop
-  const handleDropPlayer = (player, position, teamType) => {
-    if (teamType === 'A') {
-      setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
-    } else {
-      setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
-    }
-  };
-
   // Handle player removal from team
   const handleRemovePlayer = (position, teamType) => {
     if (teamType === 'A') {
@@ -84,6 +75,29 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
       setTeamAPlayers((prev) => ({ ...prev, [position]: { ...prev[position], champion } }));
     } else {
       setTeamBPlayers((prev) => ({ ...prev, [position]: { ...prev[position], champion } }));
+    }
+  };
+
+  // Handle player drop (via react-beautiful-dnd)
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result;
+
+    // If no destination, exit
+    if (!destination) {
+      return;
+    }
+
+    // Determine team type and position
+    const teamType = destination.droppableId.startsWith('A') ? 'A' : 'B';
+    const position = destination.droppableId.split('-')[1];
+
+    // Find the player by draggableId
+    const player = players.find((p) => p.id === draggableId);
+
+    if (teamType === 'A') {
+      setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
+    } else {
+      setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
     }
   };
 
@@ -103,7 +117,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   }
 
   return (
-    <DragDropContext onDragEnd={() => {}}>
+    <DragDropContext onDragEnd={onDragEnd}>
       <div>
         <h1>경기 입력</h1>
         <div style={{ display: 'flex', gap: '20px' }}>
@@ -131,13 +145,13 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
                 .filter((player) =>
                   player.name.toLowerCase().includes(searchTerm.toLowerCase())
                 )
-                .map((player) => (
-                  <DraggablePlayer key={player.id} player={player} />
+                .map((player, index) => (
+                  <DraggablePlayer key={player.id} player={player} index={index} />
                 ))}
             </div>
 
             {/* 챔피언 목록 추가 */}
-            <ChampionEntry onDropChampion={handleDropChampion} />
+            <ChampionEntry onDropChampion={(champion) => handleDropChampion(champion, 'any', 'A')} />
           </div>
           <div style={{ flex: 2 }}>
             {/* 드래그 앤 드롭 팀 영역 */}
@@ -150,14 +164,11 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
                       key={position}
                       position={position}
                       team={teamIndex === 0 ? teamAPlayers : teamBPlayers}
-                      onDropPlayer={(player) =>
-                        handleDropPlayer(player, position, teamIndex === 0 ? 'A' : 'B')
-                      }
                       onRemovePlayer={(position) =>
                         handleRemovePlayer(position, teamIndex === 0 ? 'A' : 'B')
                       }
-                      onDropChampion={(champion, position, teamType) =>
-                        handleDropChampion(champion, position, teamType)
+                      onDropChampion={(champion) =>
+                        handleDropChampion(champion, position, teamIndex === 0 ? 'A' : 'B')
                       }
                       teamType={teamIndex === 0 ? 'A' : 'B'}
                       register={register}
