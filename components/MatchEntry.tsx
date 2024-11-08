@@ -1,119 +1,13 @@
-// File: components/MatchEntry.tsx
+// File: pages/admin/MatchEntry.tsx
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useDrag, useDrop } from 'react-dnd';
+import DraggablePlayer from './DraggablePlayer';
+import DropBox from './Dropbox';
 
-const DraggablePlayer = ({ player }) => {
-  const dragRef = useRef(null);
-  const [{ isDragging }, drag] = useDrag({
-    type: 'PLAYER',
-    item: { id: player.id, name: player.name, nickname: player.nickname },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  drag(dragRef);
-
-  return (
-    <div
-      ref={dragRef}
-      style={{
-        userSelect: 'none',
-        padding: '10px',
-        backgroundColor: isDragging ? '#d3d3d3' : '#f0f0f0',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-      }}
-    >
-      {player.name}
-      <br />
-      ({player.nickname})
-    </div>
-  );
-};
-
-const DropBox = ({ position, team, onDropPlayer, onRemovePlayer }) => {
-  const dropRef = useRef(null);
-  const [{ isOver }, drop] = useDrop({
-    accept: 'PLAYER',
-    drop: (item) => onDropPlayer(item, position),
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  });
-
-  drop(dropRef);
-
-  return (
-    <div
-      ref={dropRef}
-      style={{
-        border: '2px dashed #ccc',
-        padding: '10px',
-        minHeight: '100px',
-        marginBottom: '10px',
-        backgroundColor: isOver ? '#e0e0e0' : '#f9f9f9',
-        transition: 'background-color 0.3s ease',
-        position: 'relative',
-      }}
-    >
-      <strong>{position.toUpperCase()}</strong>
-      {!team[position] && (
-        <span
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            color: '#aaa',
-            fontSize: '14px',
-          }}
-        >
-          선수 입력
-        </span>
-      )}
-      {team[position] && (
-        <div
-          style={{
-            padding: '5px',
-            backgroundColor: '#d0e8ff',
-            marginTop: '5px',
-            textAlign: 'center',
-            position: 'relative',
-          }}
-        >
-          {team[position].name}
-          <br />
-          ({team[position].nickname})
-          <div
-            onClick={() => onRemovePlayer(position, team)}
-            style={{
-              position: 'absolute',
-              top: '5px',
-              right: '5px',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              color: 'white',
-              padding: '2px 5px',
-              cursor: 'pointer',
-              fontSize: '12px',
-            }}
-          >
-            취소
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const MatchEntry = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -167,8 +61,8 @@ const MatchEntry = () => {
   };
 
   // Handle player removal from team
-  const handleRemovePlayer = (position, team) => {
-    if (team === teamAPlayers) {
+  const handleRemovePlayer = (position, teamType) => {
+    if (teamType === 'A') {
       setPlayers((prev) => [...prev, teamAPlayers[position]]);
       setTeamAPlayers((prev) => ({ ...prev, [position]: null }));
     } else {
@@ -240,31 +134,35 @@ const MatchEntry = () => {
                       onDropPlayer={(player) =>
                         handleDropPlayer(player, position, teamIndex === 0 ? 'A' : 'B')
                       }
-                      onRemovePlayer={handleRemovePlayer}
+                      onRemovePlayer={(position) =>
+                        handleRemovePlayer(position, teamIndex === 0 ? 'A' : 'B')
+                      }
+                      teamType={teamIndex === 0 ? 'A' : 'B'}
                     />
                   ))}
                 </div>
               ))}
             </div>
-            {/* 경기 입력 폼 */}
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div>
-                <label>내전 시간</label>
-                <select {...register('matchTime', { required: true })}>
-                  <option value="">시간 선택</option>
-                  <option value="오후 3시">오후 3시</option>
-                  <option value="오후 5시">오후 5시</option>
-                  <option value="오후 7시">오후 7시</option>
-                  <option value="오후 9시 30분">오후 9시 30분</option>
-                  <option value="2차">2차</option>
-                  <option value="3차">3차</option>
-                  <option value="4차">4차</option>
-                </select>
-              </div>
-              <button type="submit">경기 저장</button>
-            </form>
           </div>
         </div>
+        {/* 경기 입력 폼 */}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Match Time Selection */}
+          <div>
+            <label>내전 시간</label>
+            <select {...register('matchTime', { required: true })}>
+              <option value="">시간 선택</option>
+              <option value="오후 3시">오후 3시</option>
+              <option value="오후 5시">오후 5시</option>
+              <option value="오후 7시">오후 7시</option>
+              <option value="오후 9시 30분">오후 9시 30분</option>
+              <option value="2차">2차</option>
+              <option value="3차">3차</option>
+              <option value="4차">4차</option>
+            </select>
+          </div>
+          <button type="submit">경기 저장</button>
+        </form>
       </div>
     </DndProvider>
   );
