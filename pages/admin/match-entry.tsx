@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const MatchEntry = dynamic(() => import('../components/MatchEntry'), { ssr: false });
+const MatchEntry = dynamic(() => import('../../components/MatchEntry'), { ssr: false });
 
 const MatchEntryPage = () => {
   const [players, setPlayers] = useState([]);

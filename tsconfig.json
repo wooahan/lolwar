@@ -28,7 +28,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@components/*": ["pages/components/*"]
     }
   },
   "include": [
@@ -37,7 +36,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "firebaseConfig.d.ts",
-    "pages/components/**/*"
   ],
   "exclude": [
     "node_modules",
