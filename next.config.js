@@ -24,11 +24,14 @@ const nextConfig = withTM({
       http2: false,
     };
 
-    // 클라이언트와 서버에서 다르게 동작할 수 있는 문제를 방지하기 위해 추가 설정
-    if (!isServer) {
-      config.resolve.alias['react/jsx-runtime'] = require.resolve('react/jsx-runtime');
-      config.resolve.alias['react/jsx-dev-runtime'] = require.resolve('react/jsx-dev-runtime');
-    }
+    // 빌드에 필요한 모든 파일 포함
+    config.module.rules.push({
+      test: /\.(js|jsx|ts|tsx)$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+      },
+    });
 
     return config;
   },
