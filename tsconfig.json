@@ -14,7 +14,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -23,7 +23,8 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@components/*": ["pages/_components/*"]
     }
   },
   "include": [
@@ -31,7 +32,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "firebaseConfig.d.ts"
+    "firebaseConfig.d.ts",
+    "pages/_components/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
