@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import DraggablePlayer from './DraggablePlayer';
@@ -20,6 +20,10 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [availablePlayers, setAvailablePlayers] = useState(players);
+
+  useEffect(() => {
+    setAvailablePlayers(players);
+  }, [players]);
 
   const handleAuthenticate = () => {
     authenticate(password);
@@ -111,6 +115,8 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
     );
   }
 
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div>
@@ -167,7 +173,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
         <form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: '20px', alignSelf: 'flex-start', marginLeft: '20px' }}>
           <div style={{ marginBottom: '10px' }}>
             <label>내전 날짜</label>
-            <input type="date" {...register('matchDate', { required: true })} style={{ marginLeft: '10px' }} />
+            <input type="date" defaultValue={today} {...register('matchDate', { required: true })} style={{ marginLeft: '10px' }} />
           </div>
           <div style={{ marginBottom: '10px' }}>
             <label>내전 시간</label>
