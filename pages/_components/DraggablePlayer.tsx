@@ -2,10 +2,15 @@ import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 
 interface DraggablePlayerProps {
-  player: { id: string; name: string; nickname: string };
+  player?: { id: string; name: string; nickname: string };
 }
 
 const DraggablePlayer: React.FC<DraggablePlayerProps> = ({ player }) => {
+  if (!player) {
+    // player가 없으면 아무것도 렌더링하지 않음
+    return null;
+  }
+
   // useDraggable 훅 사용
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: player.id,

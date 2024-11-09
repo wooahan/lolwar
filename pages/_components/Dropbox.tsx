@@ -3,7 +3,7 @@ import { useDroppable } from '@dnd-kit/core';
 
 interface DropBoxProps {
   position: string;
-  team: Record<string, any>;
+  team?: Record<string, any>;
   onRemovePlayer: (position: string) => void;
   teamType: 'A' | 'B';
   register: any;
@@ -17,6 +17,8 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
       position,
     },
   });
+
+  const teamPlayer = team?.[position];
 
   return (
     <div
@@ -45,9 +47,9 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
           color: '#000',
         }}
       >
-        {position.toUpperCase()}
+        {position?.toUpperCase() || ''}
       </strong>
-      {team[position] ? (
+      {teamPlayer ? (
         <div
           style={{
             padding: '10px',
@@ -57,9 +59,9 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
             position: 'relative',
           }}
         >
-          {team[position].name}
+          {teamPlayer.name}
           <br />
-          ({team[position].nickname})
+          ({teamPlayer.nickname})
           <div
             onClick={() => onRemovePlayer(position)}
             style={{
@@ -91,7 +93,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
         </span>
       )}
       {/* Kill, Death, Assist Input Fields */}
-      {team[position] && (
+      {teamPlayer && (
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <input
             {...register(`${teamType}.${position}.kill`)}
@@ -130,8 +132,8 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
           flexWrap: 'wrap',
         }}
       >
-        {team[position]?.champion ? (
-          <img src={team[position].champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
+        {teamPlayer?.champion ? (
+          <img src={teamPlayer.champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
         ) : (
           <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
         )}

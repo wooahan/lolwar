@@ -24,14 +24,34 @@ const nextConfig = withTM({
       http2: false,
     };
 
-    // 빌드에 필요한 모든 파일 포함
+    // tsx 및 jsx 파일에 대한 babel-loader 설정 추가
     config.module.rules.push({
       test: /\.(js|jsx|ts|tsx)$/,
       exclude: /node_modules/,
       use: {
         loader: 'babel-loader',
+        options: {
+          presets: [
+            'next/babel', // next.js를 위한 babel 프리셋 추가
+            '@babel/preset-env',
+            '@babel/preset-react',
+            '@babel/preset-typescript',
+          ],
+          plugins: [
+            '@babel/plugin-transform-runtime', // 빌드 최적화 플러그인 추가
+          ],
+        },
       },
     });
+
+    // 빌드에 필요한 확장자 추가
+    config.resolve.extensions.push('.ts', '.tsx', '.js', '.jsx');
+
+    // 클라이언트와 서버에서 다르게 동작할 수 있는 문제 방지
+    if (!isServer) {
+      config.resolve.alias['react/jsx-runtime'] = require.resolve('react/jsx-runtime');
+      config.resolve.alias['react/jsx-dev-runtime'] = require.resolve('react/jsx-dev-runtime');
+    }
 
     return config;
   },
