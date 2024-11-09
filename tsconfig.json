@@ -27,12 +27,8 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@components/*": [
-        "./pages/_components/*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["pages/components/*"]
     }
   },
   "include": [
@@ -41,11 +37,10 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "firebaseConfig.d.ts",
-    "pages/_components/**/*.ts",
-    "pages/_components/**/*.tsx"
+    "pages/components/**/*"
   ],
   "exclude": [
     "node_modules",
-    "stackbit.config.ts" // Stackbit 관련 파일 제외
+    "stackbit.config.ts"
   ]
 }
