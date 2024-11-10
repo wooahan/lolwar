@@ -39,3 +39,5 @@ firebaseConfig.ts
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

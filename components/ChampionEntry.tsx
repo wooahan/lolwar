@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { DndContext, useDraggable } from '@dnd-kit/core';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/firebaseClient';
 
 interface ChampionEntryProps {
   onDropChampion: (champion: any, position: string, teamType: string) => void;
 }
 
 const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
-  const [champions, setChampions] = useState<string[]>([]);
+  const [champions, setChampions] = useState<any[]>([]);
   const [championSearchTerm, setChampionSearchTerm] = useState('');
 
-  // Load champions from local images folder
+  // Load champions from Firebase "챔피언 정보" collection
   useEffect(() => {
     const fetchChampions = async () => {
       try {
-        const response = await fetch('/images/champions');
-        if (response.ok) {
-          const files = await response.json();
-          const championNames = files.map((fileName: string) => fileName.replace('.png', ''));
-          setChampions(championNames);
-        } else {
-          console.error('Error fetching champions:', response.statusText);
-        }
+        const querySnapshot = await getDocs(collection(db, '챔피언 정보'));
+        const championData = querySnapshot.docs.map(doc => doc.data());
+        setChampions(championData);
       } catch (error) {
         console.error('Error fetching champions:', error);
       }
@@ -28,9 +25,10 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
     fetchChampions();
   }, []);
 
-  const DraggableChampion: React.FC<{ champion: string; index: number }> = ({ champion, index }) => {
+  const DraggableChampion: React.FC<{ champion: any; index: number }> = ({ champion, index }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
       id: `champion-${index}`,
+      data: { champion },
     });
 
     const style: React.CSSProperties = {
@@ -43,8 +41,8 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
         <img
-          src={`/images/champions/${champion}.png`}
-          alt={champion}
+          src={champion.imageurl}
+          alt={champion.name}
           style={{ width: '80px', height: '80px' }}
         />
       </div>
@@ -73,10 +71,10 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
       >
         {champions
           .filter((champion) =>
-            champion.toLowerCase().includes(championSearchTerm.toLowerCase())
+            champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
           )
           .map((champion, index) => (
-            <DraggableChampion key={champion} champion={champion} index={index} />
+            <DraggableChampion key={champion.name} champion={champion} index={index} />
           ))}
       </div>
     </div>
