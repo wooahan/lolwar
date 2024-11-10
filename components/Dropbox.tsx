@@ -116,10 +116,10 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
         </span>
       )}
       {/* Champion Drop Box */}
-      {teamPlayer && position === 'champion' && (
+      {position === 'champion' && (
         <div
           style={{
-            border: '1px dashed #aaa',
+            border: isOver && activePlayer?.type === 'champion' ? '2px solid green' : '1px dashed #aaa',
             padding: '10px',
             width: '100px',
             height: '100px',

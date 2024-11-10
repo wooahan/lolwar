@@ -39,13 +39,6 @@ const ChampionList: React.FC<ChampionListProps> = ({ onDropChampion }) => {
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div>
-        <h2>챔피언 목록</h2>
-        <input
-          type="text"
-          placeholder="챔피언 검색"
-          value={championSearchTerm}
-          onChange={(e) => setChampionSearchTerm(e.target.value)}
-        />
         <div
           style={{
             border: '1px solid black',
