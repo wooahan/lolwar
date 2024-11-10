@@ -4,7 +4,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/firebaseClient';
 
 interface ChampionEntryProps {
-  onDropChampion: (champion: any) => void;
+  onDropChampion: (champion: any, position: string, teamType: string) => void;
 }
 
 const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
@@ -12,14 +12,12 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
   const [championSearchTerm, setChampionSearchTerm] = useState('');
   const [activeChampion, setActiveChampion] = useState<any | null>(null);
 
-  // Load champions from Firebase
   useEffect(() => {
     const fetchChampions = async () => {
       try {
-        const championsCollection = collection(db, '챔피언 정보');
-        const championSnapshot = await getDocs(championsCollection);
-        const championList = championSnapshot.docs.map((doc) => doc.data());
-        setChampions(championList);
+        const querySnapshot = await getDocs(collection(db, '챔피언 정보'));
+        const championsData = querySnapshot.docs.map(doc => doc.data());
+        setChampions(championsData);
       } catch (error) {
         console.error('Error fetching champions:', error);
       }
@@ -30,6 +28,9 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
   const DraggableChampion: React.FC<{ champion: any; index: number }> = ({ champion, index }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
       id: `champion-${index}`,
+      data: {
+        champion,
+      },
     });
 
     const style: React.CSSProperties = {
@@ -56,18 +57,15 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
   return (
     <DndContext
       onDragStart={(event) => {
-        const draggedChampion = champions.find(
-          (champion) => `champion-${champions.indexOf(champion)}` === event.active.id
-        );
+        const draggedChampion = event.active.data.current?.champion;
         setActiveChampion(draggedChampion || null);
       }}
       onDragEnd={(event: DragEndEvent) => {
         if (event.over) {
-          const droppedChampion = champions.find(
-            (champion) => `champion-${champions.indexOf(champion)}` === event.active.id
-          );
-          if (droppedChampion) {
-            onDropChampion(droppedChampion);
+          const { teamType, position } = event.over.data.current || {};
+          const droppedChampion = event.active.data.current?.champion;
+          if (droppedChampion && teamType && position) {
+            onDropChampion(droppedChampion, position, teamType);
           }
         }
         setActiveChampion(null);

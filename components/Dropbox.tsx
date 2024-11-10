@@ -119,26 +119,28 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, regis
         </div>
       )}
       {/* Champion Drop Box */}
-      <div
-        style={{
-          border: '1px dashed #aaa',
-          padding: '10px',
-          width: '100px',
-          height: '80px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          flexWrap: 'wrap',
-          alignSelf: 'flex-end',
-        }}
-      >
-        {teamPlayer?.champion ? (
-          <img src={teamPlayer.champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
-        ) : (
-          <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
-        )}
-      </div>
+      {teamPlayer && (
+        <div
+          style={{
+            border: '1px dashed #aaa',
+            padding: '10px',
+            width: '100px',
+            height: '80px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            flexWrap: 'wrap',
+            alignSelf: 'flex-end',
+          }}
+        >
+          {teamPlayer?.champion ? (
+            <img src={teamPlayer.champion.imageUrl} alt="champion" style={{ width: '80px', height: '80px' }} />
+          ) : (
+            <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
