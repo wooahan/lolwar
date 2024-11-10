@@ -14,32 +14,17 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
   const { setNodeRef, isOver } = useDroppable({
     id: `${teamType}-${position}`,
     data: {
+      type: 'drop',
       teamType,
       position,
-      type: 'champion',
     },
   });
 
   const teamPlayer = team?.[position];
 
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    try {
-      const droppedChampionData = event.dataTransfer.getData('champion');
-      if (droppedChampionData) {
-        const droppedChampion = JSON.parse(droppedChampionData);
-        onDropChampion(position, droppedChampion, teamType);
-      }
-    } catch (error) {
-      console.error('Error handling drop:', error);
-    }
-  };
-
   return (
     <div
       ref={setNodeRef}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={handleDrop}
       style={{
         border: isOver ? '2px solid green' : '1px solid #000',
         padding: '10px',
