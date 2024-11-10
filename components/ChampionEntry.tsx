@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DndContext, useDraggable } from '@dnd-kit/core';
+import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/firebaseClient';
 
@@ -36,6 +36,7 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
       textAlign: 'center',
       opacity: isDragging ? 0.5 : 1,
       cursor: 'pointer',
+      position: 'absolute',
     };
 
     return (
@@ -49,35 +50,62 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
     );
   };
 
+  const DroppableArea: React.FC = () => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: 'droppable-area',
+    });
+
+    const style: React.CSSProperties = {
+      border: isOver ? '2px solid green' : '1px dashed black',
+      height: '200px',
+      position: 'relative',
+      marginTop: '20px',
+    };
+
+    return <div ref={setNodeRef} style={style}>챔피언 입력</div>;
+  };
+
   return (
-    <div>
-      <h2>챔피언 목록</h2>
-      <input
-        type="text"
-        placeholder="챔피언 검색"
-        value={championSearchTerm}
-        onChange={(e) => setChampionSearchTerm(e.target.value)}
-      />
-      <div
-        style={{
-          border: '1px solid black',
-          padding: '10px',
-          height: '400px',
-          overflowY: 'scroll',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(6, 1fr)',
-          gap: '10px',
-        }}
-      >
-        {champions
-          .filter((champion) =>
-            champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
-          )
-          .map((champion, index) => (
-            <DraggableChampion key={champion.name} champion={champion} index={index} />
-          ))}
+    <DndContext onDragEnd={(event) => {
+      const { active, over } = event;
+      if (over && over.id === 'droppable-area') {
+        const champion = champions.find((champ) => champ.name === active.data.current?.champion.name);
+        if (champion) {
+          onDropChampion(champion, 'somePosition', 'someTeamType');
+        }
+      }
+    }}>
+      <div>
+        <h2>챔피언 목록</h2>
+        <input
+          type="text"
+          placeholder="챔피언 검색"
+          value={championSearchTerm}
+          onChange={(e) => setChampionSearchTerm(e.target.value)}
+        />
+        <div
+          style={{
+            border: '1px solid black',
+            padding: '10px',
+            height: '400px',
+            overflowY: 'scroll',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: '10px',
+            position: 'relative',
+          }}
+        >
+          {champions
+            .filter((champion) =>
+              champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
+            )
+            .map((champion, index) => (
+              <DraggableChampion key={champion.name} champion={champion} index={index} />
+            ))}
+        </div>
+        <DroppableArea />
       </div>
-    </div>
+    </DndContext>
   );
 };
 
