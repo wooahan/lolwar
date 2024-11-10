@@ -88,15 +88,22 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
 
     if (over) {
       const { teamType, position } = over.data.current || {};
-      const player = availablePlayers.find((p) => p.id === active.id);
+      if (active.data.current?.type === 'champion' && teamType && position) {
+        // 챔피언을 드롭한 경우
+        const champion = active.data.current.champion;
+        handleDropChampion(position, champion, teamType);
+      } else {
+        // 선수 드롭 처리 로직
+        const player = availablePlayers.find((p) => p.id === active.id);
 
-      if (player && teamType && position) {
-        if (teamType === 'A') {
-          setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
-        } else {
-          setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
+        if (player && teamType && position) {
+          if (teamType === 'A') {
+            setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
+          } else {
+            setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
+          }
+          setAvailablePlayers((prevPlayers) => prevPlayers.filter((p) => p.id !== active.id));
         }
-        setAvailablePlayers((prevPlayers) => prevPlayers.filter((p) => p.id !== active.id));
       }
     }
     setActivePlayer(null);

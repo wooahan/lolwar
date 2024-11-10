@@ -16,25 +16,11 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
     data: {
       teamType,
       position,
-      type: 'champion',
+      type: 'champion-drop',
     },
   });
 
   const teamPlayer = team?.[position];
-
-  const championBoxStyle: React.CSSProperties = {
-    border: isOver ? '2px solid green' : '1px dashed #aaa',
-    padding: '10px',
-    width: '100px',
-    height: '80px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    flexWrap: 'wrap',
-    alignSelf: 'flex-end',
-    transition: 'border 0.3s ease',
-  };
 
   return (
     <div
@@ -108,41 +94,24 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
           선수 입력
         </span>
       )}
-      {/* Kill, Death, Assist Input Fields */}
-      {teamPlayer && (
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignSelf: 'flex-end' }}>
-          <input
-            {...register(`${teamType}.${position}.kill`)}
-            placeholder="킬 수"
-            type="number"
-            min="0"
-            style={{ width: '60px' }}
-          />
-          <input
-            {...register(`${teamType}.${position}.death`)}
-            placeholder="데스 수"
-            type="number"
-            min="0"
-            style={{ width: '60px' }}
-          />
-          <input
-            {...register(`${teamType}.${position}.assist`)}
-            placeholder="어시스트 수"
-            type="number"
-            min="0"
-            style={{ width: '60px' }}
-          />
-        </div>
-      )}
       {/* Champion Drop Box */}
       {teamPlayer && (
-        <div ref={setNodeRef} style={championBoxStyle}>
+        <div
+          style={{
+            border: '1px dashed #aaa',
+            padding: '10px',
+            width: '100px',
+            height: '80px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            flexWrap: 'wrap',
+            alignSelf: 'flex-end',
+          }}
+        >
           {teamPlayer?.champion ? (
-            <img
-              src={teamPlayer.champion.imageurl}
-              alt="champion"
-              style={{ width: '80px', height: '80px' }}
-            />
+            <img src={teamPlayer.champion.imageurl} alt="champion" style={{ width: '80px', height: '80px' }} />
           ) : (
             <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
           )}

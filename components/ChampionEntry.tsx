@@ -17,10 +17,6 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
       try {
         const querySnapshot = await getDocs(collection(db, '챔피언 정보'));
         const championsData = querySnapshot.docs.map((doc) => doc.data());
-        
-        // 콘솔 로그로 데이터를 확인합니다.
-        console.log('Fetched Champions Data:', championsData);
-        
         setChampions(championsData);
       } catch (error) {
         console.error('Error fetching champions:', error);
@@ -33,6 +29,7 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
       id: `champion-${index}`,
       data: {
+        type: 'champion', // 드래그 시 타입을 명시
         champion,
       },
     });
@@ -49,17 +46,11 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
 
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-        {champion.imageurl ? (
-          <img
-            src={champion.imageurl}
-            alt={champion.name}
-            style={{ width: '100%', height: '100%' }}
-          />
-        ) : (
-          <div style={{ width: '100%', height: '100%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            No Image
-          </div>
-        )}
+        <img
+          src={champion.imageurl}
+          alt={champion.name}
+          style={{ width: '100%', height: '100%' }}
+        />
       </div>
     );
   };
@@ -71,13 +62,6 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
         setActiveChampion(draggedChampion || null);
       }}
       onDragEnd={(event: DragEndEvent) => {
-        if (event.over) {
-          const { teamType, position } = event.over.data.current || {};
-          const droppedChampion = event.active.data.current?.champion;
-          if (droppedChampion && teamType && position) {
-            onDropChampion(droppedChampion, position, teamType);
-          }
-        }
         setActiveChampion(null);
       }}
     >
