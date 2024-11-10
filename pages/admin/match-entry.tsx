@@ -6,9 +6,11 @@ import PlayerList from '../../components/PlayerList';
 import Teams from '../../components/Teams';
 import ChampionEntry from '../../components/ChampionEntry';
 import MatchAuthentication from '../../components/MatchAuthentication';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
 const MatchEntryPage = () => {
   const [players, setPlayers] = useState([]);
+  const [availablePlayers, setAvailablePlayers] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
@@ -20,6 +22,7 @@ const MatchEntryPage = () => {
       try {
         const response = await axios.get(`${window.location.origin}/api/get-players`);
         setPlayers(response.data);
+        setAvailablePlayers(response.data);
       } catch (error) {
         console.error('Error fetching players:', error);
       }
@@ -51,14 +54,37 @@ const MatchEntryPage = () => {
     }
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over) {
+      const { teamType, position } = over.data.current || {};
+      const player = availablePlayers.find((p) => p.id === active.id);
+      if (player && teamType && position) {
+        if (teamType === 'A') {
+          setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
+        } else {
+          setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
+        }
+        setAvailablePlayers((prevPlayers) => prevPlayers.filter((p) => p.id !== active.id));
+      }
+    }
+    setActivePlayer(null);
+  };
+
+  const resetTeams = () => {
+    setTeamAPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
+    setTeamBPlayers({ top: null, jungle: null, mid: null, adc: null, support: null });
+    setAvailablePlayers(players);
+  };
+
   return (
     <div>
       <MatchAuthentication isAuthenticated={isAuthenticated} authenticate={authenticate} />
       {isAuthenticated && (
-        <>
+        <DndContext onDragEnd={handleDragEnd}>
           <h1>경기 입력</h1>
           <div style={{ display: 'flex', gap: '20px' }}>
-            <PlayerList players={players} setAvailablePlayers={setPlayers} availablePlayers={players} />
+            <PlayerList players={players} setAvailablePlayers={setAvailablePlayers} availablePlayers={availablePlayers} />
             <Teams
               teamAPlayers={teamAPlayers}
               teamBPlayers={teamBPlayers}
@@ -69,7 +95,8 @@ const MatchEntryPage = () => {
             />
           </div>
           <ChampionEntry onDropChampion={(champion, position, teamType) => handleDropChampion(position, champion, teamType)} />
-        </>
+          <button onClick={resetTeams} style={{ marginTop: '20px' }}>초기화</button>
+        </DndContext>
       )}
     </div>
   );

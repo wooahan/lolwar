@@ -101,7 +101,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
           style={{
             border: isOver ? '2px solid green' : '1px dashed #aaa',
             padding: '10px',
-            width: '100px',
+            width: '120px',
             height: '80px',
             display: 'flex',
             alignItems: 'center',

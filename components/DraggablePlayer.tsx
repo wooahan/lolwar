@@ -1,3 +1,4 @@
+// File: components/DraggablePlayer.tsx
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 
@@ -14,6 +15,10 @@ const DraggablePlayer: React.FC<DraggablePlayerProps> = ({ player }) => {
   // useDraggable 훅 사용
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: player.id,
+    data: {
+      type: 'player',
+      player,
+    },
   });
 
   // 스타일 객체에 명시적으로 타입 지정
