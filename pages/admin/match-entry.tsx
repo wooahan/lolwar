@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import PlayerList from '../../components/PlayerList';
 import Teams from '../../components/Teams';
-import ChampionEntry from '../../components/ChampionEntry';
+import ChampionList from '../../components/ChampionList';
 import MatchAuthentication from '../../components/MatchAuthentication';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
@@ -95,7 +95,7 @@ const MatchEntry = () => {
               setAvailablePlayers={setAvailablePlayers}
             />
           </div>
-          <ChampionEntry onDropChampion={(champion, position, teamType) => handleDropChampion(position, champion, teamType)} />
+          <ChampionList onDropChampion={(champion, position, teamType) => handleDropChampion(position, champion, teamType)} />
           <button onClick={resetTeams} style={{ marginTop: '20px' }}>초기화</button>
         </DndContext>
       )}
