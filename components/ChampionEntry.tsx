@@ -38,14 +38,16 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
       opacity: isDragging ? 0.5 : 1,
       cursor: 'pointer',
       display: 'inline-block',
+      width: '80px',
+      height: '80px',
     };
 
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
         <img
           src={champion.imageUrl}
-          alt="champion"
-          style={{ width: '80px', height: '80px' }}
+          alt={champion.name}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
     );
@@ -103,7 +105,7 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
         {activeChampion && (
           <img
             src={activeChampion.imageUrl}
-            alt="champion"
+            alt={activeChampion.name}
             style={{ width: '80px', height: '80px', pointerEvents: 'none' }}
           />
         )}
