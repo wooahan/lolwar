@@ -1,20 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/firebaseClient';
 import DraggablePlayer from './DraggablePlayer';
 
 interface PlayerListProps {
-  players: any[];
   setAvailablePlayers: React.Dispatch<React.SetStateAction<any[]>>;
   availablePlayers: any[];
 }
 
-const PlayerList: React.FC<PlayerListProps> = ({ players, availablePlayers, setAvailablePlayers }) => {
+const PlayerList: React.FC<PlayerListProps> = ({ availablePlayers, setAvailablePlayers }) => {
+  const [players, setPlayers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (players.length > 0) {
-      setAvailablePlayers(players);
-    }
-  }, [players]);
+    const fetchPlayers = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, '선수 정보'));
+        const playersData = querySnapshot.docs.map((doc) => doc.data());
+        setPlayers(playersData);
+        setAvailablePlayers(playersData);
+      } catch (error) {
+        console.error('Error fetching players:', error);
+      }
+    };
+    fetchPlayers();
+  }, [setAvailablePlayers]);
 
   return (
     <div style={{ flex: 1 }}>
@@ -39,10 +49,10 @@ const PlayerList: React.FC<PlayerListProps> = ({ players, availablePlayers, setA
       >
         {availablePlayers.length > 0 ? (
           availablePlayers
-            .filter((player) => player.name && player.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            .filter((player) => player?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
             .map((player) => <DraggablePlayer key={player.id} player={player} />)
         ) : (
-          <p>선수를 찾을 수 없습니다.</p>
+          <span style={{ gridColumn: 'span 6', textAlign: 'center' }}>선수를 찾을 수 없습니다.</span>
         )}
       </div>
     </div>
