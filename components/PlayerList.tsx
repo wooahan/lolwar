@@ -11,7 +11,9 @@ const PlayerList: React.FC<PlayerListProps> = ({ players, availablePlayers, setA
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    setAvailablePlayers(players);
+    if (players.length > 0) {
+      setAvailablePlayers(players);
+    }
   }, [players]);
 
   return (
@@ -27,18 +29,21 @@ const PlayerList: React.FC<PlayerListProps> = ({ players, availablePlayers, setA
         style={{
           border: '1px solid black',
           padding: '10px',
-          height: '400px',
+          height: 'auto',
+          maxHeight: '400px',
           overflowY: 'scroll',
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gap: '10px',
         }}
       >
-        {availablePlayers
-          .filter((player) => player.name.toLowerCase().includes(searchTerm.toLowerCase()))
-          .map((player) => (
-            <DraggablePlayer key={player.id} player={player} />
-          ))}
+        {availablePlayers.length > 0 ? (
+          availablePlayers
+            .filter((player) => player.name && player.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            .map((player) => <DraggablePlayer key={player.id} player={player} />)
+        ) : (
+          <p>선수를 찾을 수 없습니다.</p>
+        )}
       </div>
     </div>
   );
