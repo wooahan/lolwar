@@ -68,13 +68,11 @@ const ChampionList: React.FC<ChampionListProps> = ({ onDropChampion }) => {
       </div>
       <DragOverlay>
         {activeChampion && (
-          <div style={{ width: '80px', height: '80px' }}>
-            <img
-              src={activeChampion.imageurl}
-              alt={activeChampion.name}
-              style={{ width: '100%', height: '100%', pointerEvents: 'none' }}
-            />
-          </div>
+          <img
+            src={activeChampion.imageurl}
+            alt=""
+            style={{ width: '80px', height: '80px', pointerEvents: 'none' }}
+          />
         )}
       </DragOverlay>
     </DndContext>

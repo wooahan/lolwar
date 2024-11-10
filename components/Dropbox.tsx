@@ -16,7 +16,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
   const { setNodeRef, isOver } = useDroppable({
     id: `${teamType}-${position}`,
     data: {
-      type: 'drop',
+      type: position === 'champion' ? 'champion-drop' : 'player-drop',
       teamType,
       position,
     },
@@ -24,16 +24,34 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
 
   const teamPlayer = team?.[position];
 
+  const getBorderColor = () => {
+    if (isOver && activePlayer?.type === 'champion' && position === 'champion') {
+      return '2px solid green';
+    } else if (isOver && activePlayer?.type === 'player' && position !== 'champion') {
+      return '2px solid blue';
+    }
+    return '1px solid #000';
+  };
+
+  const getBackgroundColor = () => {
+    if (isOver && activePlayer?.type === 'champion' && position === 'champion') {
+      return '#e0ffe0';
+    } else if (isOver && activePlayer?.type === 'player' && position !== 'champion') {
+      return '#e0e0ff';
+    }
+    return '#f9f9f9';
+  };
+
   return (
     <div
       ref={setNodeRef}
       style={{
-        border: isOver || (activePlayer && activePlayer.teamType === teamType && activePlayer.position === position) ? '2px solid green' : '1px solid #000',
+        border: getBorderColor(),
         padding: '10px',
         minHeight: '100px',
         marginBottom: '10px',
-        backgroundColor: isOver ? '#e0ffe0' : '#f9f9f9',
-        transition: 'background-color 0.3s ease',
+        backgroundColor: getBackgroundColor(),
+        transition: 'background-color 0.3s ease, border 0.3s ease',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -98,13 +116,13 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
         </span>
       )}
       {/* Champion Drop Box */}
-      {teamPlayer && (
+      {teamPlayer && position === 'champion' && (
         <div
           style={{
-            border: isOver ? '2px solid green' : '1px dashed #aaa',
+            border: '1px dashed #aaa',
             padding: '10px',
-            width: '100%',
-            height: '120px',
+            width: '100px',
+            height: '100px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -122,7 +140,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
         </div>
       )}
       {/* Kill, Death, Assist Input Fields */}
-      {teamPlayer && (
+      {teamPlayer && position !== 'champion' && (
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignSelf: 'center', marginTop: '10px' }}>
           <input
             {...register(`${teamType}.${position}.kill`)}

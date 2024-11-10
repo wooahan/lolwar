@@ -47,6 +47,7 @@ const DraggableChamp: React.FC<DraggableChampProps> = ({ champion }) => {
       style={style} // 스타일 적용
       {...listeners} // 드래그 이벤트 리스너
       {...attributes} // 접근성 관련 속성
+      data-type="champion" // 챔피언임을 나타내는 데이터 속성 추가
     >
       <img
         src={champion.imageurl}
