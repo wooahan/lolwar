@@ -19,7 +19,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   const [password, setPassword] = useState('');
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
-  const [availablePlayers, setAvailablePlayers] = useState(players);
+  const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
 
   useEffect(() => {
     setAvailablePlayers(players);
