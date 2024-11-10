@@ -49,9 +49,9 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
 
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-        {champion.imageUrl ? (
+        {champion.imageurl ? (
           <img
-            src={champion.imageUrl}
+            src={champion.imageurl}
             alt={champion.name}
             style={{ width: '100%', height: '100%' }}
           />
@@ -112,7 +112,7 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
       <DragOverlay>
         {activeChampion && (
           <img
-            src={activeChampion.imageUrl}
+            src={activeChampion.imageurl}
             alt={activeChampion.name}
             style={{ width: '80px', height: '80px', pointerEvents: 'none' }}
           />
