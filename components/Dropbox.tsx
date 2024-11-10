@@ -5,7 +5,7 @@ interface DropBoxProps {
   position: string;
   team?: Record<string, any>;
   onRemovePlayer: (position: string) => void;
-  onDropChampion: (position: string, champion: any) => void;
+  onDropChampion: (position: string, champion: any, teamType: 'A' | 'B') => void;
   teamType: 'A' | 'B';
   register: any;
 }
@@ -16,15 +16,30 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
     data: {
       teamType,
       position,
-      type: 'champion-drop',
+      type: 'champion',
     },
   });
 
   const teamPlayer = team?.[position];
 
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    try {
+      const droppedChampionData = event.dataTransfer.getData('champion');
+      if (droppedChampionData) {
+        const droppedChampion = JSON.parse(droppedChampionData);
+        onDropChampion(position, droppedChampion, teamType);
+      }
+    } catch (error) {
+      console.error('Error handling drop:', error);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleDrop}
       style={{
         border: isOver ? '2px solid green' : '1px solid #000',
         padding: '10px',
@@ -98,7 +113,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
       {teamPlayer && (
         <div
           style={{
-            border: '1px dashed #aaa',
+            border: isOver ? '2px solid green' : '1px dashed #aaa',
             padding: '10px',
             width: '100px',
             height: '80px',
@@ -108,6 +123,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
             cursor: 'pointer',
             flexWrap: 'wrap',
             alignSelf: 'flex-end',
+            transition: 'border 0.3s ease',
           }}
         >
           {teamPlayer?.champion ? (
@@ -115,6 +131,32 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
           ) : (
             <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
           )}
+        </div>
+      )}
+      {/* Kill, Death, Assist Input Fields */}
+      {teamPlayer && (
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignSelf: 'center', marginTop: '10px' }}>
+          <input
+            {...register(`${teamType}.${position}.kill`)}
+            placeholder="킬 수"
+            type="number"
+            min="0"
+            style={{ width: '60px' }}
+          />
+          <input
+            {...register(`${teamType}.${position}.death`)}
+            placeholder="데스 수"
+            type="number"
+            min="0"
+            style={{ width: '60px' }}
+          />
+          <input
+            {...register(`${teamType}.${position}.assist`)}
+            placeholder="어시스트 수"
+            type="number"
+            min="0"
+            style={{ width: '60px' }}
+          />
         </div>
       )}
     </div>
