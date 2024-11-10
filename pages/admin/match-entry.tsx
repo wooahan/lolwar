@@ -8,7 +8,7 @@ import ChampionEntry from '../../components/ChampionEntry';
 import MatchAuthentication from '../../components/MatchAuthentication';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
-const MatchEntryPage = () => {
+const MatchEntry = () => {
   const [players, setPlayers] = useState([]);
   const [availablePlayers, setAvailablePlayers] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -92,6 +92,7 @@ const MatchEntryPage = () => {
               handleDropChampion={handleDropChampion}
               register={() => {}}
               activePlayer={activePlayer}
+              setAvailablePlayers={setAvailablePlayers}
             />
           </div>
           <ChampionEntry onDropChampion={(champion, position, teamType) => handleDropChampion(position, champion, teamType)} />
@@ -102,4 +103,4 @@ const MatchEntryPage = () => {
   );
 };
 
-export default MatchEntryPage;
+export default MatchEntry;

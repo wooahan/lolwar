@@ -1,3 +1,4 @@
+// File: components/DropBox.tsx
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
@@ -39,6 +40,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
         gap: '20px',
         position: 'relative',
         flexWrap: 'wrap',
+        width: '100%',
       }}
     >
       <strong
@@ -101,8 +103,8 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
           style={{
             border: isOver ? '2px solid green' : '1px dashed #aaa',
             padding: '10px',
-            width: '120px',
-            height: '80px',
+            width: '100%',
+            height: '120px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
