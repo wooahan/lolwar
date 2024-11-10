@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import { DndContext, useDraggable, DragOverlay, DragEndEvent } from '@dnd-kit/core';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/firebaseClient';
 
 interface ChampionEntryProps {
-  onDropChampion: (champion: any, position: string, teamType: string) => void;
+  onDropChampion: (champion: any) => void;
 }
 
 const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
   const [champions, setChampions] = useState<any[]>([]);
   const [championSearchTerm, setChampionSearchTerm] = useState('');
+  const [activeChampion, setActiveChampion] = useState<any | null>(null);
 
-  // Load champions from Firebase "챔피언 정보" collection
+  // Load champions from Firebase
   useEffect(() => {
     const fetchChampions = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, '챔피언 정보'));
-        const championData = querySnapshot.docs.map(doc => doc.data());
-        setChampions(championData);
+        const championsCollection = collection(db, '챔피언 정보');
+        const championSnapshot = await getDocs(championsCollection);
+        const championList = championSnapshot.docs.map((doc) => doc.data());
+        setChampions(championList);
       } catch (error) {
         console.error('Error fetching champions:', error);
       }
@@ -28,7 +30,6 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
   const DraggableChampion: React.FC<{ champion: any; index: number }> = ({ champion, index }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
       id: `champion-${index}`,
-      data: { champion },
     });
 
     const style: React.CSSProperties = {
@@ -36,45 +37,40 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
       textAlign: 'center',
       opacity: isDragging ? 0.5 : 1,
       cursor: 'pointer',
-      position: 'absolute',
+      display: 'inline-block',
     };
 
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
         <img
-          src={champion.imageurl}
-          alt={champion.name}
+          src={champion.imageUrl}
+          alt="champion"
           style={{ width: '80px', height: '80px' }}
         />
       </div>
     );
   };
 
-  const DroppableArea: React.FC = () => {
-    const { setNodeRef, isOver } = useDroppable({
-      id: 'droppable-area',
-    });
-
-    const style: React.CSSProperties = {
-      border: isOver ? '2px solid green' : '1px dashed black',
-      height: '200px',
-      position: 'relative',
-      marginTop: '20px',
-    };
-
-    return <div ref={setNodeRef} style={style}>챔피언 입력</div>;
-  };
-
   return (
-    <DndContext onDragEnd={(event) => {
-      const { active, over } = event;
-      if (over && over.id === 'droppable-area') {
-        const champion = champions.find((champ) => champ.name === active.data.current?.champion.name);
-        if (champion) {
-          onDropChampion(champion, 'somePosition', 'someTeamType');
+    <DndContext
+      onDragStart={(event) => {
+        const draggedChampion = champions.find(
+          (champion) => `champion-${champions.indexOf(champion)}` === event.active.id
+        );
+        setActiveChampion(draggedChampion || null);
+      }}
+      onDragEnd={(event: DragEndEvent) => {
+        if (event.over) {
+          const droppedChampion = champions.find(
+            (champion) => `champion-${champions.indexOf(champion)}` === event.active.id
+          );
+          if (droppedChampion) {
+            onDropChampion(droppedChampion);
+          }
         }
-      }
-    }}>
+        setActiveChampion(null);
+      }}
+    >
       <div>
         <h2>챔피언 목록</h2>
         <input
@@ -92,7 +88,6 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
             display: 'grid',
             gridTemplateColumns: 'repeat(6, 1fr)',
             gap: '10px',
-            position: 'relative',
           }}
         >
           {champions
@@ -103,8 +98,16 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
               <DraggableChampion key={champion.name} champion={champion} index={index} />
             ))}
         </div>
-        <DroppableArea />
       </div>
+      <DragOverlay>
+        {activeChampion && (
+          <img
+            src={activeChampion.imageUrl}
+            alt="champion"
+            style={{ width: '80px', height: '80px', pointerEvents: 'none' }}
+          />
+        )}
+      </DragOverlay>
     </DndContext>
   );
 };

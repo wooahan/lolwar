@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragOverlay, DragEndEvent } from '@dnd-kit/core';
 import DraggablePlayer from './DraggablePlayer';
 import DropBox from './Dropbox';
 import ChampionEntry from './ChampionEntry';
@@ -20,6 +20,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
+  const [activePlayer, setActivePlayer] = useState<any | null>(null);
 
   useEffect(() => {
     setAvailablePlayers(players);
@@ -98,6 +99,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
         setAvailablePlayers((prevPlayers) => prevPlayers.filter((p) => p.id !== active.id));
       }
     }
+    setActivePlayer(null);
   };
 
   if (!isAuthenticated) {
@@ -118,7 +120,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={handleDragEnd} onDragStart={({ active }) => setActivePlayer(active.id)}>
       <div>
         <h1>경기 입력</h1>
         <div style={{ display: 'flex', gap: '20px' }}>
@@ -191,6 +193,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
           <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>
         </form>
       </div>
+      <DragOverlay>{activePlayer ? <DraggablePlayer player={availablePlayers.find((p) => p.id === activePlayer)} /> : null}</DragOverlay>
     </DndContext>
   );
 };
