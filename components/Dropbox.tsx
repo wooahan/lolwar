@@ -8,9 +8,10 @@ interface DropBoxProps {
   onDropChampion: (position: string, champion: any, teamType: 'A' | 'B') => void;
   teamType: 'A' | 'B';
   register: any;
+  activePlayer: any;
 }
 
-const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDropChampion, register, teamType }) => {
+const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDropChampion, register, teamType, activePlayer }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: `${teamType}-${position}`,
     data: {
@@ -26,7 +27,7 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
     <div
       ref={setNodeRef}
       style={{
-        border: isOver ? '2px solid green' : '1px solid #000',
+        border: isOver || (activePlayer && activePlayer.teamType === teamType && activePlayer.position === position) ? '2px solid green' : '1px solid #000',
         padding: '10px',
         minHeight: '100px',
         marginBottom: '10px',
