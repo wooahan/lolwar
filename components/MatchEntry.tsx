@@ -102,6 +102,14 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
     setActivePlayer(null);
   };
 
+  const handleDropChampion = (position: string, champion: any, teamType: string) => {
+    if (teamType === 'A') {
+      setTeamAPlayers((prev) => ({ ...prev, [position]: { ...prev[position], champion } }));
+    } else {
+      setTeamBPlayers((prev) => ({ ...prev, [position]: { ...prev[position], champion } }));
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div>
@@ -165,6 +173,7 @@ const MatchEntry: React.FC<MatchEntryProps> = ({ players, isAuthenticated, authe
                       onRemovePlayer={(position) => handleRemovePlayer(position, teamIndex === 0 ? 'A' : 'B')}
                       teamType={teamIndex === 0 ? 'A' : 'B'}
                       register={register}
+                      onDropChampion={(position, champion) => handleDropChampion(position, champion, teamIndex === 0 ? 'A' : 'B')}
                     />
                   ))}
                 </div>
