@@ -1,4 +1,4 @@
-// File: components/DropBox.tsx
+// File: components/Dropbox.tsx
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
@@ -10,13 +10,14 @@ interface DropBoxProps {
   teamType: 'A' | 'B';
   register: any;
   activePlayer: any;
+  setAvailablePlayers: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDropChampion, register, teamType, activePlayer }) => {
+const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDropChampion, register, teamType, activePlayer, setAvailablePlayers }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: `${teamType}-${position}`,
     data: {
-      type: position === 'champion' ? 'champion-drop' : 'player-drop',
+      type: 'player',
       teamType,
       position,
     },
@@ -25,21 +26,34 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
   const teamPlayer = team?.[position];
 
   const getBorderColor = () => {
-    if (isOver && activePlayer?.type === 'champion' && position === 'champion') {
-      return '2px solid green';
-    } else if (isOver && activePlayer?.type === 'player' && position !== 'champion') {
+    if (isOver) {
       return '2px solid blue';
     }
     return '1px solid #000';
   };
 
   const getBackgroundColor = () => {
-    if (isOver && activePlayer?.type === 'champion' && position === 'champion') {
-      return '#e0ffe0';
-    } else if (isOver && activePlayer?.type === 'player' && position !== 'champion') {
+    if (isOver) {
       return '#e0e0ff';
     }
     return '#f9f9f9';
+  };
+
+  const handleDrop = (champion: any) => {
+    // 기존에 이미 선수 등록된 위치에 선수가 있다면 해당 선수를 먼저 목록에 추가합니다.
+    if (teamPlayer) {
+      setAvailablePlayers((prev) => {
+        if (!prev.some((p) => p.id === teamPlayer.id)) {
+          return [...prev, teamPlayer];
+        }
+        return prev;
+      });
+    }
+
+    // 새로운 선수를 등록하고, 팀 상태를 업데이트합니다.
+    onDropChampion(position, champion, teamType);
+    // 선수 목록에서 새로운 선수를 제거합니다.
+    setAvailablePlayers((prev) => prev.filter((p) => p.id !== champion.id));
   };
 
   return (
@@ -86,7 +100,17 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
           <br />
           ({teamPlayer.nickname})
           <div
-            onClick={() => onRemovePlayer(position)}
+            onClick={() => {
+              // 해당 위치에서 선수를 제거합니다.
+              onRemovePlayer(position);
+              // 선수 목록에 다시 추가합니다.
+              setAvailablePlayers((prev) => {
+                if (!prev.some((p) => p.id === teamPlayer.id)) {
+                  return [...prev, teamPlayer];
+                }
+                return prev;
+              });
+            }}
             style={{
               position: 'absolute',
               top: '5px',
@@ -114,56 +138,6 @@ const DropBox: React.FC<DropBoxProps> = ({ position, team, onRemovePlayer, onDro
         >
           선수 입력
         </span>
-      )}
-      {/* Champion Drop Box */}
-      {position === 'champion' && (
-        <div
-          style={{
-            border: isOver && activePlayer?.type === 'champion' ? '2px solid green' : '1px dashed #aaa',
-            padding: '10px',
-            width: '100px',
-            height: '100px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            flexWrap: 'wrap',
-            alignSelf: 'flex-end',
-            transition: 'border 0.3s ease',
-          }}
-        >
-          {teamPlayer?.champion ? (
-            <img src={teamPlayer.champion.imageurl} alt="champion" style={{ width: '80px', height: '80px' }} />
-          ) : (
-            <span style={{ color: '#aaa', fontSize: '14px' }}>챔피언 입력</span>
-          )}
-        </div>
-      )}
-      {/* Kill, Death, Assist Input Fields */}
-      {teamPlayer && position !== 'champion' && (
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignSelf: 'center', marginTop: '10px' }}>
-          <input
-            {...register(`${teamType}.${position}.kill`)}
-            placeholder="킬 수"
-            type="number"
-            min="0"
-            style={{ width: '60px' }}
-          />
-          <input
-            {...register(`${teamType}.${position}.death`)}
-            placeholder="데스 수"
-            type="number"
-            min="0"
-            style={{ width: '60px' }}
-          />
-          <input
-            {...register(`${teamType}.${position}.assist`)}
-            placeholder="어시스트 수"
-            type="number"
-            min="0"
-            style={{ width: '60px' }}
-          />
-        </div>
       )}
     </div>
   );

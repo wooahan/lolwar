@@ -1,13 +1,11 @@
 // File: pages/admin/match-entry.tsx
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PlayerList from '../../components/PlayerList';
 import Teams from '../../components/Teams';
 import ChampionList from '../../components/ChampionList';
 import MatchAuthentication from '../../components/MatchAuthentication';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/firebaseClient';
 
 const MatchEntry = () => {
   const [players, setPlayers] = useState([]);
@@ -16,21 +14,6 @@ const MatchEntry = () => {
   const [teamAPlayers, setTeamAPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [activePlayer, setActivePlayer] = useState(null);
-
-  // Load players from Firebase on component mount
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, '선수 정보'));
-        const playersData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setPlayers(playersData);
-        setAvailablePlayers(playersData);
-      } catch (error) {
-        console.error('Error fetching players:', error);
-      }
-    };
-    fetchPlayers();
-  }, []);
 
   const authenticate = (password: string) => {
     if (password === '1717') {
@@ -84,9 +67,12 @@ const MatchEntry = () => {
       <MatchAuthentication isAuthenticated={isAuthenticated} authenticate={authenticate} />
       {isAuthenticated && (
         <DndContext onDragEnd={handleDragEnd}>
-          <h1>경기 입력</h1>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h1>경기 입력</h1>
+            <button onClick={resetTeams} style={{ marginLeft: '20px' }}>초기화</button>
+          </div>
           <div style={{ display: 'flex', gap: '20px' }}>
-            <PlayerList availablePlayers={availablePlayers} setAvailablePlayers={setAvailablePlayers} />
+            <PlayerList availablePlayers={availablePlayers} setAvailablePlayers={setAvailablePlayers} setPlayers={setPlayers} />
             <Teams
               teamAPlayers={teamAPlayers}
               teamBPlayers={teamBPlayers}
@@ -98,7 +84,6 @@ const MatchEntry = () => {
             />
           </div>
           <ChampionList onDropChampion={(champion, position, teamType) => handleDropChampion(position, champion, teamType)} />
-          <button onClick={resetTeams} style={{ marginTop: '20px' }}>초기화</button>
         </DndContext>
       )}
     </div>

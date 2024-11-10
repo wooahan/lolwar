@@ -47,6 +47,7 @@ const Teams: React.FC<TeamsProps> = ({
                 register={register}
                 onDropChampion={(position, champion) => handleDropPlayer(position, teamIndex === 0 ? 'A' : 'B', champion)}
                 activePlayer={activePlayer}
+                setAvailablePlayers={setAvailablePlayers}
               />
             ))}
           </div>

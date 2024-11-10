@@ -38,26 +38,37 @@ const ChampionList: React.FC<ChampionListProps> = ({ onDropChampion }) => {
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div>
-        <div
-          style={{
-            border: '1px solid black',
-            padding: '10px',
-            height: '400px',
-            overflowY: 'scroll',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
-            gap: '10px',
-          }}
-        >
-          {champions
-            .filter((champion) =>
-              champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
-            )
-            .map((champion) => (
-              <DraggableChamp key={champion.name} champion={champion} />
-            ))}
-        </div>
+      <h2>챔피언 목록</h2>
+      <input
+        type="text"
+        placeholder="챔피언 검색"
+        value={championSearchTerm}
+        onChange={(e) => setChampionSearchTerm(e.target.value)}
+        style={{ marginBottom: '10px', padding: '5px' }}
+      />
+      <div
+        style={{
+          border: '1px solid black',
+          padding: '10px',
+          height: '400px',
+          width: '600px',
+          maxHeight: '400px',
+          overflowY: 'scroll',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: '10px',
+        }}
+      >
+        {champions
+          .filter((champion) =>
+            typeof champion.name === 'string' &&
+            champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
+          )
+          .map((champion) => (
+            <div key={champion.name} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <img src={champion.imageurl} alt={champion.name} style={{ width: '80px', height: '80px' }} />
+            </div>
+          ))}
       </div>
       <DragOverlay>
         {activeChampion && (
