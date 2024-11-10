@@ -16,7 +16,11 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
     const fetchChampions = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, '챔피언 정보'));
-        const championsData = querySnapshot.docs.map(doc => doc.data());
+        const championsData = querySnapshot.docs.map((doc) => doc.data());
+        
+        // 콘솔 로그로 데이터를 확인합니다.
+        console.log('Fetched Champions Data:', championsData);
+        
         setChampions(championsData);
       } catch (error) {
         console.error('Error fetching champions:', error);
@@ -45,11 +49,17 @@ const ChampionEntry: React.FC<ChampionEntryProps> = ({ onDropChampion }) => {
 
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-        <img
-          src={champion.imageUrl}
-          alt={champion.name}
-          style={{ width: '100%', height: '100%' }}
-        />
+        {champion.imageUrl ? (
+          <img
+            src={champion.imageUrl}
+            alt={champion.name}
+            style={{ width: '100%', height: '100%' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            No Image
+          </div>
+        )}
       </div>
     );
   };
