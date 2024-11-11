@@ -1,54 +1,38 @@
-// File: components/MainView.tsx
+// File: components/Teams.tsx
 import React, { useState } from 'react';
 import PlayerList from './PlayerList';
 import ChampionList from './ChampionList';
+import { Tabs, Tab } from '@mui/material';
 
 const MainView: React.FC = () => {
   const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
   const [players, setPlayers] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'players' | 'champions'>('players');
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       {/* Tab Navigation */}
-      <div style={{ display: 'flex', width: '100%', marginBottom: '20px' }}>
-        <div
-          onClick={() => setActiveTab('players')}
-          style={{
-            flex: 1,
-            textAlign: 'center',
-            padding: '10px',
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'players' ? '#b80056' : '#fff',
-            color: activeTab === 'players' ? '#fff' : '#000',
-          }}
-        >
-          선수 목록
-        </div>
-        <div
-          onClick={() => setActiveTab('champions')}
-          style={{
-            flex: 1,
-            textAlign: 'center',
-            padding: '10px',
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'champions' ? '#b80056' : '#fff',
-            color: activeTab === 'champions' ? '#fff' : '#000',
-          }}
-        >
-          챔피언 목록
-        </div>
-      </div>
+      <Tabs value={activeTab} onChange={handleTabChange} style={{ marginBottom: '20px' }}>
+        <Tab label="선수 및 챔피언 목록" />
+      </Tabs>
 
       {/* Tab Content */}
-      {activeTab === 'players' ? (
-        <PlayerList
-          availablePlayers={availablePlayers}
-          setAvailablePlayers={setAvailablePlayers}
-          setPlayers={setPlayers}
-        />
-      ) : (
-        <ChampionList onDropChampion={() => {}} />
+      {activeTab === 0 && (
+        <div style={{ flex: 1, marginBottom: '20px' }}>
+          <h2>선수 및 챔피언 목록</h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+            <PlayerList
+              availablePlayers={availablePlayers}
+              setAvailablePlayers={setAvailablePlayers}
+              setPlayers={setPlayers}
+            />
+            <ChampionList onDropChampion={() => {}} />
+          </div>
+        </div>
       )}
     </div>
   );

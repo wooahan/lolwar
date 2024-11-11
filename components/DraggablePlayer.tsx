@@ -29,7 +29,7 @@ const DraggablePlayer: React.FC<DraggablePlayerProps> = ({ player }) => {
     alignItems: 'center',
     minHeight: '100px',
     backgroundColor: isDragging ? '#f0f0f0' : '#f9f9f9',
-    opacity: isDragging ? 0.8 : 1, // Add opacity to indicate dragging state
+    opacity: isDragging ? 0.8 : 1,
     position: 'relative',
   };
 
