@@ -37,20 +37,20 @@ const MatchEntry = () => {
     }
   };
 
-  const handleRemovePlayer = (teamType: string, index: number) => {
+  const handleRemovePlayer = (teamType: string, position: string) => {
     if (teamType === 'A') {
       const updatedTeamA = { ...teamAPlayers };
-      const player = Object.values(updatedTeamA)[index];
+      const player = updatedTeamA[position];
       if (player) {
-        updatedTeamA[index] = null;
+        updatedTeamA[position] = null;
         setTeamAPlayers(updatedTeamA);
         setAvailablePlayers((prev) => [...prev, player]);
       }
     } else {
       const updatedTeamB = { ...teamBPlayers };
-      const player = Object.values(updatedTeamB)[index];
+      const player = updatedTeamB[position];
       if (player) {
-        updatedTeamB[index] = null;
+        updatedTeamB[position] = null;
         setTeamBPlayers(updatedTeamB);
         setAvailablePlayers((prev) => [...prev, player]);
       }
@@ -64,13 +64,13 @@ const MatchEntry = () => {
     setAvailablePlayers(players);
   };
 
-  const handleSelectChampion = (teamType: string, index: number, champion: any) => {
+  const handleSelectChampion = (teamType: string, position: string, champion: any) => {
     if (teamType === 'A') {
       setSelectedChampions((prev) => ({
         ...prev,
         A: {
           ...prev.A,
-          [index]: champion,
+          [position]: champion,
         },
       }));
     } else {
@@ -78,7 +78,7 @@ const MatchEntry = () => {
         ...prev,
         B: {
           ...prev.B,
-          [index]: champion,
+          [position]: champion,
         },
       }));
     }
@@ -96,7 +96,6 @@ const MatchEntry = () => {
 
   const saveMatchInfo = async (data: any) => {
     try {
-      // 팀 A와 팀 B 각각의 포지션에 있는 선수들과 그들의 정보 저장
       for (const [position, player] of Object.entries(teamAPlayers)) {
         if (player) {
           await FirebaseMatchLogger({
@@ -157,15 +156,15 @@ const MatchEntry = () => {
         />
         <MatchForm onSubmit={handleMatchFormSubmit} />
       </div>
-        <Teams
-          teamAPlayers={teamAPlayers}
-          teamBPlayers={teamBPlayers}
-          handleRemovePlayer={handleRemovePlayer}
-          handleSelectChampion={handleSelectChampion}
-          selectedChampions={selectedChampions}
-          setTeamAPlayers={setTeamAPlayers}
-          setTeamBPlayers={setTeamBPlayers}
-        />
+      <Teams
+        teamAPlayers={teamAPlayers}
+        teamBPlayers={teamBPlayers}
+        handleRemovePlayer={handleRemovePlayer}
+        handleSelectChampion={handleSelectChampion}
+        selectedChampions={selectedChampions}
+        setTeamAPlayers={setTeamAPlayers}
+        setTeamBPlayers={setTeamBPlayers}
+      />
     </div>
   );
 };

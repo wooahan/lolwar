@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ChampionList from './ChampionList';
 
 interface DropBoxProps {
-  team?: Record<string, any>;
+  team?: any;
   onRemovePlayer: () => void;
   onSelectChampion: (champion: any) => void;
   teamType: 'A' | 'B';
@@ -21,7 +21,7 @@ const DropBox: React.FC<DropBoxProps> = ({
 }) => {
   const [stats, setStats] = useState({ kills: '', deaths: '', assists: '' });
   const [showChampionSearch, setShowChampionSearch] = useState(false);
-  const [line, setLine] = useState(''); // 라인을 저장할 상태 변수 추가
+  const [line, setLine] = useState('');
 
   const handleStatChange = (e: React.ChangeEvent<HTMLInputElement>, stat: string) => {
     const value = e.target.value;
@@ -38,8 +38,16 @@ const DropBox: React.FC<DropBoxProps> = ({
     const playerData = e.dataTransfer.getData('player');
     if (playerData) {
       const player = JSON.parse(playerData);
-      setTeamPlayers((prev) => ({ ...prev, [player.id]: player }));
-      setShowChampionSearch(false);
+
+      // 선수 등록 (라인 선택 없이 즉시 등록)
+      setTeamPlayers((prev) => {
+        // 비어있는 포지션에 선수를 자동으로 배정
+        const emptyPosition = Object.keys(prev).find((position) => !prev[position]);
+        if (emptyPosition) {
+          return { ...prev, [emptyPosition]: player };
+        }
+        return prev;
+      });
     }
   };
 
