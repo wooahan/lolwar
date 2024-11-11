@@ -1,4 +1,4 @@
-// File: pages/match-entry.tsx
+// Updated: pages/match-entry.tsx
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import Teams from '../../components/Teams';
@@ -86,56 +86,94 @@ const MatchEntry = () => {
 
   const handleMatchFormSubmit = (data: any) => {
     const matchInfo = {
-      ...data,
-      teamAPlayers,
-      teamBPlayers,
-      selectedChampions,
+      matchDate: data.matchDate,
+      matchTime: data.matchTime,
+      winningTeam: data.winningTeam === 'A팀' ? 'teamA' : 'teamB',
+      teamA: {
+        탑: {
+          champion: selectedChampions.A["top"] || '',
+          player: teamAPlayers.top?.name || '',
+          kills: data.teamA?.top?.kills || 0,
+          deaths: data.teamA?.top?.deaths || 0,
+          assists: data.teamA?.top?.assists || 0,
+        },
+        정글: {
+          champion: selectedChampions.A["jungle"] || '',
+          player: teamAPlayers.jungle?.name || '',
+          kills: data.teamA?.jungle?.kills || 0,
+          deaths: data.teamA?.jungle?.deaths || 0,
+          assists: data.teamA?.jungle?.assists || 0,
+        },
+        미드: {
+          champion: selectedChampions.A["mid"] || '',
+          player: teamAPlayers.mid?.name || '',
+          kills: data.teamA?.mid?.kills || 0,
+          deaths: data.teamA?.mid?.deaths || 0,
+          assists: data.teamA?.mid?.assists || 0,
+        },
+        원딜: {
+          champion: selectedChampions.A["adc"] || '',
+          player: teamAPlayers.adc?.name || '',
+          kills: data.teamA?.adc?.kills || 0,
+          deaths: data.teamA?.adc?.deaths || 0,
+          assists: data.teamA?.adc?.assists || 0,
+        },
+        서폿: {
+          champion: selectedChampions.A["support"] || '',
+          player: teamAPlayers.support?.name || '',
+          kills: data.teamA?.support?.kills || 0,
+          deaths: data.teamA?.support?.deaths || 0,
+          assists: data.teamA?.support?.assists || 0,
+        },
+      },
+      teamB: {
+        탑: {
+          champion: selectedChampions.B["top"] || '',
+          player: teamBPlayers.top?.name || '',
+          kills: data.teamB?.top?.kills || 0,
+          deaths: data.teamB?.top?.deaths || 0,
+          assists: data.teamB?.top?.assists || 0,
+        },
+        정글: {
+          champion: selectedChampions.B["jungle"] || '',
+          player: teamBPlayers.jungle?.name || '',
+          kills: data.teamB?.jungle?.kills || 0,
+          deaths: data.teamB?.jungle?.deaths || 0,
+          assists: data.teamB?.jungle?.assists || 0,
+        },
+        미드: {
+          champion: selectedChampions.B["mid"] || '',
+          player: teamBPlayers.mid?.name || '',
+          kills: data.teamB?.mid?.kills || 0,
+          deaths: data.teamB?.mid?.deaths || 0,
+          assists: data.teamB?.mid?.assists || 0,
+        },
+        원딜: {
+          champion: selectedChampions.B["adc"] || '',
+          player: teamBPlayers.adc?.name || '',
+          kills: data.teamB?.adc?.kills || 0,
+          deaths: data.teamB?.adc?.deaths || 0,
+          assists: data.teamB?.adc?.assists || 0,
+        },
+        서폿: {
+          champion: selectedChampions.B["support"] || '',
+          player: teamBPlayers.support?.name || '',
+          kills: data.teamB?.support?.kills || 0,
+          deaths: data.teamB?.support?.deaths || 0,
+          assists: data.teamB?.support?.assists || 0,
+        },
+      },
     };
     saveMatchInfo(matchInfo);
   };
 
-  const saveMatchInfo = async (data: any) => {
+  const saveMatchInfo = async (matchInfo: any) => {
     try {
-      for (const [position, player] of Object.entries(teamAPlayers)) {
-        if (player) {
-          await FirebaseMatchLogger({
-            team: 'A',
-            position,
-            player: player.name,
-            kills: data.kills || 0,
-            deaths: data.deaths || 0,
-            assists: data.assists || 0,
-            champion: selectedChampions.A[position] || 'Unknown',
-            matchDate: data.matchDate,
-            matchTime: data.matchTime,
-            isSetVictory: data.winningTeam === 'A팀',
-            gameWinCount: data.winningTeam === 'A팀' ? 1 : 0,
-          });
-        }
-      }
-      for (const [position, player] of Object.entries(teamBPlayers)) {
-        if (player) {
-          await FirebaseMatchLogger({
-            team: 'B',
-            position,
-            player: player.name,  // 선수 이름 추가
-            kills: data.kills || 0,
-            deaths: data.deaths || 0,
-            assists: data.assists || 0,
-            champion: selectedChampions.B[position] || 'Unknown',
-            matchDate: data.matchDate,
-            matchTime: data.matchTime,
-            isSetVictory: data.winningTeam === 'B팀',
-            gameWinCount: data.winningTeam === 'B팀' ? 1 : 0,
-          });
-        }
-      }
-      console.log('경기 정보가 성공적으로 저장되었습니다.');
+      await FirebaseMatchLogger(matchInfo);
     } catch (e) {
-      console.error('문서 추가 중 오류 발생: ', e);
+      console.error('경기 정보를 저장하는 중 오류가 발생했습니다: ', e);
     }
   };
-  
 
   if (isLoading) {
     return <div>Loading...</div>;
