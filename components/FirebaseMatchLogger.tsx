@@ -1,7 +1,5 @@
-// File: components/firebase/FirebaseMatchLogger.tsx
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { collection, addDoc, getFirestore } from 'firebase/firestore';
+// File: components/FirebaseMatchLogger.tsx
+import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebaseClient';
 
 interface MatchLoggerProps {
@@ -17,45 +15,24 @@ interface MatchLoggerProps {
   gameWinCount: number;
 }
 
-const FirebaseMatchLogger: React.FC<MatchLoggerProps> = ({
-  team,
-  position,
-  kills,
-  deaths,
-  assists,
-  champion,
-  matchDate,
-  matchTime,
-  isSetVictory,
-  gameWinCount,
-}) => {
-    const { register, handleSubmit } = useForm();
-
-  const saveMatchInfo = async (data: any) => {
-    try {
-      await addDoc(collection(db, '경기 정보'), {
-        팀: team,
-        라인: position,
-        킬: kills,
-        데스: deaths,
-        어시스트: assists,
-        챔피언: champion,
-        경기날짜: matchDate,
-        경기시간: matchTime,
-        세트승리: isSetVictory,
-        게임승리: gameWinCount >= 2,
-      });
-      console.log('Match information saved successfully');
-    } catch (e) {
-      console.error('Error adding document: ', e);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit(saveMatchInfo)}>
-      <button type="submit">경기 정보 저장</button>
-    </form>
-  );
+const FirebaseMatchLogger = async (data: MatchLoggerProps) => {
+  try {
+    await addDoc(collection(db, '경기 정보'), {
+      팀: data.team,
+      라인: data.position,
+      킬: data.kills,
+      데스: data.deaths,
+      어시스트: data.assists,
+      챔피언: data.champion,
+      경기날짜: data.matchDate,
+      경기시간: data.matchTime,
+      세트승리: data.isSetVictory,
+      게임승리: data.gameWinCount >= 2,
+    });
+    console.log('경기 정보가 성공적으로 저장되었습니다.');
+  } catch (e) {
+    console.error('문서 추가 중 오류 발생: ', e);
+  }
 };
 
 export default FirebaseMatchLogger;

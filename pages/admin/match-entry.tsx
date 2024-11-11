@@ -115,9 +115,9 @@ const MatchEntry = () => {
           });
         }
       }
-      console.log('Match information saved successfully');
+      console.log('경기 정보가 성공적으로 저장되었습니다.');
     } catch (e) {
-      console.error('Error adding document: ', e);
+      console.error('문서 추가 중 오류 발생: ', e);
     }
   };
 
