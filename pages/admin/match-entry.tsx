@@ -5,6 +5,7 @@ import Teams from '../../components/Teams';
 import MatchAuthentication from '../../components/MatchAuthentication';
 import MainView from '../../components/MainView';
 import MatchForm from '../../components/MatchForm';
+import FirebaseMatchLogger from '../../components/FirebaseMatchLogger';
 
 const MatchEntry = () => {
   const [players, setPlayers] = useState<{ id: string; name: string; nickname: string }[]>([]);
@@ -70,8 +71,54 @@ const MatchEntry = () => {
   };
 
   const handleMatchFormSubmit = (data: any) => {
-    console.log('Match data saved:', data);
-    // You can add code here to save match data to a database or state.
+    const matchInfo = {
+      ...data,
+      teamAPlayers,
+      teamBPlayers,
+      selectedChampions,
+    };
+    saveMatchInfo(matchInfo);
+  };
+
+  const saveMatchInfo = async (data: any) => {
+    try {
+      // 팀 A와 팀 B 각각의 포지션에 있는 선수들과 그들의 정보 저장
+      for (const [position, player] of Object.entries(teamAPlayers)) {
+        if (player) {
+          await FirebaseMatchLogger({
+            team: 'A',
+            position,
+            kills: data.kills || 0,
+            deaths: data.deaths || 0,
+            assists: data.assists || 0,
+            champion: selectedChampions.A[position] || 'Unknown',
+            matchDate: data.matchDate,
+            matchTime: data.matchTime,
+            isSetVictory: data.winningTeam === 'A팀',
+            gameWinCount: data.winningTeam === 'A팀' ? 1 : 0,
+          });
+        }
+      }
+      for (const [position, player] of Object.entries(teamBPlayers)) {
+        if (player) {
+          await FirebaseMatchLogger({
+            team: 'B',
+            position,
+            kills: data.kills || 0,
+            deaths: data.deaths || 0,
+            assists: data.assists || 0,
+            champion: selectedChampions.B[position] || 'Unknown',
+            matchDate: data.matchDate,
+            matchTime: data.matchTime,
+            isSetVictory: data.winningTeam === 'B팀',
+            gameWinCount: data.winningTeam === 'B팀' ? 1 : 0,
+          });
+        }
+      }
+      console.log('Match information saved successfully');
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
   };
 
   if (isLoading) {

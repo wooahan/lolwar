@@ -28,6 +28,14 @@ const MatchForm: React.FC<MatchFormProps> = ({ onSubmit }) => {
           <option value="4차">4차</option>
         </select>
       </div>
+      <div style={{ marginBottom: '10px' }}>
+        <label>승리 팀</label>
+        <select {...register('winningTeam', { required: true })} style={{ marginLeft: '10px' }}>
+          <option value="">팀 선택</option>
+          <option value="A팀">A팀</option>
+          <option value="B팀">B팀</option>
+        </select>
+      </div>
       <button type="submit" style={{ marginTop: '10px' }}>경기 저장</button>
     </form>
   );
