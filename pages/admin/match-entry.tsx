@@ -101,6 +101,7 @@ const MatchEntry = () => {
           await FirebaseMatchLogger({
             team: 'A',
             position,
+            player: player.name,
             kills: data.kills || 0,
             deaths: data.deaths || 0,
             assists: data.assists || 0,
@@ -117,6 +118,7 @@ const MatchEntry = () => {
           await FirebaseMatchLogger({
             team: 'B',
             position,
+            player: player.name,  // 선수 이름 추가
             kills: data.kills || 0,
             deaths: data.deaths || 0,
             assists: data.assists || 0,
@@ -133,6 +135,7 @@ const MatchEntry = () => {
       console.error('문서 추가 중 오류 발생: ', e);
     }
   };
+  
 
   if (isLoading) {
     return <div>Loading...</div>;

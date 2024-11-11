@@ -5,6 +5,7 @@ import { db } from '../firebaseClient';
 interface MatchLoggerProps {
   team: 'A' | 'B';
   position: string;
+  player: string;
   kills: number;
   deaths: number;
   assists: number;
@@ -20,6 +21,7 @@ const FirebaseMatchLogger = async (data: MatchLoggerProps) => {
     await addDoc(collection(db, '경기 정보'), {
       팀: data.team,
       라인: data.position,
+      선수: data.player,  // 선수 이름 추가
       킬: data.kills,
       데스: data.deaths,
       어시스트: data.assists,
@@ -29,6 +31,7 @@ const FirebaseMatchLogger = async (data: MatchLoggerProps) => {
       세트승리: data.isSetVictory,
       게임승리: data.gameWinCount >= 2,
     });
+    alert('경기 정보가 저장되었습니다.');
     console.log('경기 정보가 성공적으로 저장되었습니다.');
   } catch (e) {
     console.error('문서 추가 중 오류 발생: ', e);
