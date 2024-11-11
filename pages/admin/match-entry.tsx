@@ -2,18 +2,18 @@
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import Teams from '../../components/Teams';
-import PlayerList from '../../components/PlayerList';
 import MatchAuthentication from '../../components/MatchAuthentication';
-import { DndContext, closestCenter, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
-import ChampionList from '../../components/ChampionList';
+import MainView from '../../components/MainView';
+import MatchForm from '../../components/MatchForm';
 
 const MatchEntry = () => {
-  const [players, setPlayers] = useState([]);
-  const [availablePlayers, setAvailablePlayers] = useState([]);
+  const [players, setPlayers] = useState<{ id: string; name: string; nickname: string }[]>([]);
+  const [availablePlayers, setAvailablePlayers] = useState<{ id: string; name: string; nickname: string }[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [teamAPlayers, setTeamAPlayers] = useState<{ top: any, jungle: any, mid: any, adc: any, support: any }>({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [teamBPlayers, setTeamBPlayers] = useState<{ top: any, jungle: any, mid: any, adc: any, support: any }>({ top: null, jungle: null, mid: null, adc: null, support: null });
   const [selectedChampions, setSelectedChampions] = useState<{ A: Record<string, any>, B: Record<string, any> }>({ A: {}, B: {} });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initialPlayers = [
@@ -25,6 +25,7 @@ const MatchEntry = () => {
     ];
     setPlayers(initialPlayers);
     setAvailablePlayers(initialPlayers);
+    setIsLoading(false);
   }, []);
 
   const authenticate = (password: string) => {
@@ -58,25 +59,7 @@ const MatchEntry = () => {
     setAvailablePlayers(players);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over) {
-      const { teamType, position } = over?.data?.current || {};
-      if (teamType && position) {
-        const player = availablePlayers.find((p) => p.id === active.id);
-        if (player) {
-          if (teamType === 'A') {
-            setTeamAPlayers((prev) => ({ ...prev, [position]: player }));
-          } else {
-            setTeamBPlayers((prev) => ({ ...prev, [position]: player }));
-          }
-          setAvailablePlayers((prevPlayers) => prevPlayers.filter((p) => p.id !== active.id));
-        }
-      }
-    }
-  };
-
-  const handleDropChampion = (teamType: 'A' | 'B', position: string, champion: any) => {
+  const handleSelectChampion = (teamType: string, position: string, champion: any) => {
     setSelectedChampions((prev) => ({
       ...prev,
       [teamType]: {
@@ -86,29 +69,42 @@ const MatchEntry = () => {
     }));
   };
 
+  const handleMatchFormSubmit = (data: any) => {
+    console.log('Match data saved:', data);
+    // You can add code here to save match data to a database or state.
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <MatchAuthentication isAuthenticated={isAuthenticated} authenticate={authenticate} />;
+  }
+
   return (
-    <div>
-      <MatchAuthentication isAuthenticated={isAuthenticated} authenticate={authenticate} />
-      {isAuthenticated && (
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h1>경기 입력</h1>
-            <button onClick={resetTeams} style={{ marginLeft: '20px' }}>초기화</button>
-          </div>
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <div style={{ flex: 1 }}>
-              <PlayerList availablePlayers={availablePlayers} setAvailablePlayers={setAvailablePlayers} setPlayers={setPlayers} />
-              <ChampionList onDropChampion={handleDropChampion} />
-            </div>
-            <Teams
-              teamAPlayers={teamAPlayers}
-              teamBPlayers={teamBPlayers}
-              handleRemovePlayer={handleRemovePlayer}
-              handleDropChampion={handleDropChampion}
-            />
-          </div>
-        </DndContext>
-      )}
+    <div style={{ display: 'flex', gap: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h1>경기 입력</h1>
+          <button onClick={resetTeams} style={{ marginLeft: '20px' }}>초기화</button>
+        </div>
+        <MainView
+          availablePlayers={availablePlayers}
+          setAvailablePlayers={setAvailablePlayers}
+          setPlayers={setPlayers}
+        />
+        <MatchForm onSubmit={handleMatchFormSubmit} />
+      </div>
+      <Teams
+        teamAPlayers={teamAPlayers}
+        teamBPlayers={teamBPlayers}
+        handleRemovePlayer={handleRemovePlayer}
+        handleSelectChampion={handleSelectChampion}
+        selectedChampions={selectedChampions}
+        setTeamAPlayers={setTeamAPlayers}
+        setTeamBPlayers={setTeamBPlayers}
+      />
     </div>
   );
 };

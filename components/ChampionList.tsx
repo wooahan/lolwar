@@ -1,44 +1,33 @@
 // File: components/ChampionList.tsx
 import React, { useState, useEffect } from 'react';
-import { DndContext, DragEndEvent, DragStartEvent, DragOverlay } from '@dnd-kit/core';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/firebaseClient';
-import DraggableChamp from './DraggableChamp';
 
 interface ChampionListProps {
-  onDropChampion: (champion: any, position: string, teamType: string) => void;
+  setChampions: (champions: any[]) => void;
+  onSelectChampion: (champion: any) => void;
 }
 
-const ChampionList: React.FC<ChampionListProps> = ({ onDropChampion }) => {
-  const [champions, setChampions] = useState<any[]>([]);
+const ChampionList: React.FC<ChampionListProps> = ({ setChampions, onSelectChampion }) => {
+  const [champions, setLocalChampions] = useState<any[]>([]);
   const [championSearchTerm, setChampionSearchTerm] = useState('');
-  const [activeChampion, setActiveChampion] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchChampions = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, '챔피언 정보'));
         const championsData = querySnapshot.docs.map((doc) => doc.data());
+        setLocalChampions(championsData);
         setChampions(championsData);
       } catch (error) {
         console.error('Error fetching champions:', error);
       }
     };
     fetchChampions();
-  }, []);
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const draggedChampion = event.active.data.current?.champion;
-    setActiveChampion(draggedChampion || null);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    setActiveChampion(null);
-  };
+  }, [setChampions]);
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <h2>챔피언 목록</h2>
+    <div>
       <input
         type="text"
         placeholder="챔피언 검색"
@@ -57,6 +46,7 @@ const ChampionList: React.FC<ChampionListProps> = ({ onDropChampion }) => {
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gap: '10px',
+          textAlign: 'left',
         }}
       >
         {champions
@@ -65,21 +55,23 @@ const ChampionList: React.FC<ChampionListProps> = ({ onDropChampion }) => {
             champion.name.toLowerCase().includes(championSearchTerm.toLowerCase())
           )
           .map((champion) => (
-            <div key={champion.name} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <img src={champion.imageurl} alt={champion.name} style={{ width: '80px', height: '80px' }} />
+            <div
+              key={champion.name}
+              onClick={() => onSelectChampion(champion)}
+              style={{
+                cursor: 'pointer',
+                transition: 'background-color 0.2s ease',
+              }}
+            >
+              <img
+                src={champion.imageurl}
+                alt={champion.name}
+                style={{ width: '60px', height: '60px' }}
+              />
             </div>
           ))}
       </div>
-      <DragOverlay>
-        {activeChampion && (
-          <img
-            src={activeChampion.imageurl}
-            alt=""
-            style={{ width: '80px', height: '80px', pointerEvents: 'none' }}
-          />
-        )}
-      </DragOverlay>
-    </DndContext>
+    </div>
   );
 };
 

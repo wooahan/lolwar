@@ -1,40 +1,34 @@
-// File: components/Teams.tsx
-import React, { useState } from 'react';
+// File: components/MainView.tsx
+import React from 'react';
 import PlayerList from './PlayerList';
-import ChampionList from './ChampionList';
-import { Tabs, Tab } from '@mui/material';
+import { Box } from '@mui/material';
 
-const MainView: React.FC = () => {
-  const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
-  const [players, setPlayers] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState(0);
+interface MainViewProps {
+  availablePlayers: any[];
+  setAvailablePlayers: React.Dispatch<React.SetStateAction<any[]>>;
+  setPlayers: React.Dispatch<React.SetStateAction<any[]>>;
+}
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
+const MainView: React.FC<MainViewProps> = ({ availablePlayers, setAvailablePlayers, setPlayers }) => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-      {/* Tab Navigation */}
-      <Tabs value={activeTab} onChange={handleTabChange} style={{ marginBottom: '20px' }}>
-        <Tab label="선수 및 챔피언 목록" />
-      </Tabs>
-
-      {/* Tab Content */}
-      {activeTab === 0 && (
-        <div style={{ flex: 1, marginBottom: '20px' }}>
-          <h2>선수 및 챔피언 목록</h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-            <PlayerList
-              availablePlayers={availablePlayers}
-              setAvailablePlayers={setAvailablePlayers}
-              setPlayers={setPlayers}
-            />
-            <ChampionList onDropChampion={() => {}} />
-          </div>
-        </div>
-      )}
-    </div>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        width: '100%',
+        maxWidth: '800px',
+      }}
+    >
+      <div>
+        <h2>선수 목록</h2>
+        <PlayerList
+          availablePlayers={availablePlayers}
+          setAvailablePlayers={setAvailablePlayers}
+          setPlayers={setPlayers}
+        />
+      </div>
+    </Box>
   );
 };
 

@@ -1,3 +1,4 @@
+// File: components/MatchAuthentication.tsx
 import React, { useState } from 'react';
 
 interface MatchAuthenticationProps {
@@ -7,10 +8,6 @@ interface MatchAuthenticationProps {
 
 const MatchAuthentication: React.FC<MatchAuthenticationProps> = ({ isAuthenticated, authenticate }) => {
   const [password, setPassword] = useState('');
-
-  if (isAuthenticated) {
-    return null;
-  }
 
   return (
     <div style={{ position: 'relative' }}>

@@ -17,7 +17,9 @@ const PlayerList: React.FC<PlayerListProps> = ({ availablePlayers, setAvailableP
     const fetchPlayers = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, '선수 정보'));
-        const playersData = querySnapshot.docs.map((doc) => ({ id: doc.id, name: doc.data().name, nickname: doc.data().nickname }));
+        const playersData = querySnapshot.docs
+          .map((doc) => ({ id: doc.id, name: doc.data().name, nickname: doc.data().nickname }))
+          .sort((a, b) => a.name.localeCompare(b.name)); // Sort players alphabetically by name
         setPlayers(playersData);
         setAvailablePlayers(playersData);
       } catch (error) {
@@ -29,7 +31,6 @@ const PlayerList: React.FC<PlayerListProps> = ({ availablePlayers, setAvailableP
 
   return (
     <div style={{ flex: 1, marginBottom: '20px' }}>
-      <h2>선수 목록</h2>
       <input
         type="text"
         placeholder="선수 검색"
@@ -49,6 +50,7 @@ const PlayerList: React.FC<PlayerListProps> = ({ availablePlayers, setAvailableP
           gridTemplateColumns: 'repeat(5, 1fr)',
           gap: '10px',
           position: 'relative',
+          textAlign: 'left',
         }}
       >
         {availablePlayers.length > 0 ? (
@@ -65,6 +67,11 @@ const PlayerList: React.FC<PlayerListProps> = ({ availablePlayers, setAvailableP
                   alignItems: 'center',
                   backgroundColor: '#f0f0f0',
                   borderRadius: '8px',
+                  cursor: 'grab',
+                }}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('player', JSON.stringify(player));
                 }}
               >
                 <div style={{ width: '100px', height: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
